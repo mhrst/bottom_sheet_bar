@@ -42,7 +42,10 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
           locked: _isLocked,
           color: Colors.lightBlueAccent,
           controller: _bsbController,
-          borderRadius: 32.0,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(32.0),
+            topRight: Radius.circular(32.0),
+          ),
           expandedBuilder: (scrollController) => Container(
             height: 256.0,
             child: Text('Expanded'),

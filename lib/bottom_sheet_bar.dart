@@ -13,7 +13,7 @@ class BottomSheetBar extends StatefulWidget {
   final Color color;
   final Color backdropColor;
 
-  final double borderRadius;
+  final BorderRadiusGeometry borderRadius;
 
   final bool isDismissable;
   final bool locked;
@@ -142,10 +142,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
               animation: _animationController,
               builder: (context, child) => Material(
                 color: widget.color,
-                borderRadius: BorderRadius.only(
-                  topRight: Radius.circular(widget.borderRadius),
-                  topLeft: Radius.circular(widget.borderRadius),
-                ),
+                borderRadius: widget.borderRadius,
                 elevation: 0,
                 child: SafeArea(
                   child: Ink(
