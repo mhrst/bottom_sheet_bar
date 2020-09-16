@@ -13,10 +13,7 @@ class BottomSheetBar extends StatefulWidget {
   final Color color;
   final Color backdropColor;
 
-  final BorderRadiusGeometry borderRadius;
-
-  final double collapsedHeight;
-  final double expandedHeight;
+  final double borderRadius;
 
   final bool isDismissable;
   final bool locked;
@@ -29,8 +26,6 @@ class BottomSheetBar extends StatefulWidget {
       this.color = Colors.white,
       this.backdropColor = Colors.transparent,
       this.borderRadius,
-      this.collapsedHeight = kToolbarHeight,
-      this.expandedHeight = kToolbarHeight * 3,
       this.isDismissable = true,
       this.locked = true,
       Key key})
@@ -73,6 +68,8 @@ class BottomSheetBarController {
 
 class _BottomSheetBarState extends State<BottomSheetBar>
     with SingleTickerProviderStateMixin {
+  final _keyCollapsed = GlobalKey();
+  final _keyExpanded = GlobalKey();
   final _scrollController = ScrollController();
   final _velocityTracker = VelocityTracker(PointerDeviceKind.touch);
 
@@ -80,7 +77,10 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   BottomSheetBarController _controller;
   bool _isScrollable = false;
 
-  double get _heightDiff => widget.expandedHeight - widget.collapsedHeight;
+  double _expandedHeight = 0;
+  double _collapsedHeight = 0;
+
+  double get _heightDiff => _expandedHeight - _collapsedHeight;
 
   @override
   Widget build(BuildContext context) => Stack(
@@ -142,44 +142,52 @@ class _BottomSheetBarState extends State<BottomSheetBar>
               animation: _animationController,
               builder: (context, child) => Material(
                 color: widget.color,
-                borderRadius: widget.borderRadius,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(widget.borderRadius),
+                  topLeft: Radius.circular(widget.borderRadius),
+                ),
                 elevation: 0,
-                child: Ink(
-                  height: _animationController.value * _heightDiff +
-                      widget.collapsedHeight,
-                  child: Stack(
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          height: widget.expandedHeight,
-                          child: FadeTransition(
-                            opacity: Tween(begin: 0.0, end: 1.0)
-                                .animate(_animationController),
-                            child: IgnorePointer(
-                              ignoring: _controller.isCollapsed,
-                              child: widget.expandedBuilder(_scrollController),
+                child: SafeArea(
+                  child: Ink(
+                    height: _expandedHeight == 0 && _collapsedHeight == 0
+                        ? double.infinity
+                        : _animationController.value * _heightDiff +
+                            _collapsedHeight,
+                    child: Stack(
+                      children: [
+                        if (widget.collapsed != null)
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: FadeTransition(
+                              opacity: Tween(begin: 1.0, end: 0.0)
+                                  .animate(_animationController),
+                              child: IgnorePointer(
+                                ignoring: !_controller.isCollapsed,
+                                child: Container(
+                                  key: _keyCollapsed,
+                                  child: widget.collapsed,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.bottomCenter,
-                        child: Container(
-                          height: widget.collapsedHeight,
-                          child: widget.collapsed == null
-                              ? SizedBox.shrink()
-                              : FadeTransition(
-                                  opacity: Tween(begin: 1.0, end: 0.0)
-                                      .animate(_animationController),
-                                  child: IgnorePointer(
-                                    ignoring: !_controller.isCollapsed,
-                                    child: widget.collapsed,
-                                  ),
+                        if (widget.expandedBuilder != null)
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: FadeTransition(
+                              opacity: Tween(begin: 0.0, end: 1.0)
+                                  .animate(_animationController),
+                              child: IgnorePointer(
+                                ignoring: _controller.isCollapsed,
+                                child: Container(
+                                  key: _keyExpanded,
+                                  child:
+                                      widget.expandedBuilder(_scrollController),
                                 ),
-                        ),
-                      ),
-                    ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -196,6 +204,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
 
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(_setHeights);
     super.initState();
 
     _animationController = AnimationController(
@@ -238,5 +247,15 @@ class _BottomSheetBarState extends State<BottomSheetBar>
         _scrollController.offset <= 0) {
       setState(() => _isScrollable = dy < 0);
     }
+  }
+
+  void _setHeights(_) {
+    final RenderBox collapsedBox =
+        _keyCollapsed.currentContext.findRenderObject();
+    setState(() => _collapsedHeight = collapsedBox.size.height);
+
+    final RenderBox exapndedBox =
+        _keyExpanded.currentContext.findRenderObject();
+    setState(() => _expandedHeight = exapndedBox.size.height);
   }
 }
