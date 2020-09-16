@@ -141,7 +141,9 @@ class _BottomSheetBarState extends State<BottomSheetBar>
             child: AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) => Material(
-                color: widget.color,
+                color: _expandedHeight == 0 && _collapsedHeight == 0
+                    ? Colors.transparent
+                    : widget.color,
                 borderRadius: widget.borderRadius,
                 elevation: 0,
                 child: SafeArea(
@@ -200,6 +202,15 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   }
 
   @override
+  void didUpdateWidget(BottomSheetBar oldWidget) {
+    _expandedHeight = 0;
+    _collapsedHeight = 0;
+    WidgetsBinding.instance.addPostFrameCallback(_setHeights);
+
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(_setHeights);
     super.initState();
@@ -246,13 +257,15 @@ class _BottomSheetBarState extends State<BottomSheetBar>
     }
   }
 
-  void _setHeights(_) {
+  void _setHeights([dynamic _]) {
     final RenderBox collapsedBox =
-        _keyCollapsed.currentContext.findRenderObject();
+        _keyCollapsed.currentContext?.findRenderObject();
+    if (collapsedBox == null) return;
     setState(() => _collapsedHeight = collapsedBox.size.height);
 
-    final RenderBox exapndedBox =
-        _keyExpanded.currentContext.findRenderObject();
-    setState(() => _expandedHeight = exapndedBox.size.height);
+    final RenderBox expandedBox =
+        _keyExpanded.currentContext?.findRenderObject();
+    if (expandedBox == null) return;
+    setState(() => _expandedHeight = expandedBox.size.height);
   }
 }
