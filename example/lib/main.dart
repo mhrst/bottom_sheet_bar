@@ -46,9 +46,24 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
             topLeft: Radius.circular(32.0),
             topRight: Radius.circular(32.0),
           ),
-          expandedBuilder: (scrollController) => Container(
-            height: 256.0,
-            child: Text('Expanded'),
+          expandedBuilder: (scrollController) => CustomScrollView(
+            shrinkWrap: true,
+            slivers: [
+              if (_isLocked)
+                SliverToBoxAdapter(
+                  child: Container(
+                    height: 256.0,
+                    child: Text('Locked+Expanded Bottom Sheet'),
+                  ),
+                ),
+              if (!_isLocked)
+                SliverToBoxAdapter(
+                  child: Container(
+                    height: 512.0,
+                    child: Text('Expanded Bottom Sheet'),
+                  ),
+                ),
+            ],
           ),
           collapsed: Container(
             height: kToolbarHeight + 12.0,
