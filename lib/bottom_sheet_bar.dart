@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 
 const VELOCITY_MIN = 320.0;
 
@@ -7,6 +8,7 @@ class BottomSheetBar extends StatefulWidget {
   final Widget body;
   final Widget Function(ScrollController) expandedBuilder;
   final Widget collapsed;
+  final double height;
 
   final BottomSheetBarController controller;
 
@@ -26,11 +28,13 @@ class BottomSheetBar extends StatefulWidget {
       this.color = Colors.white,
       this.backdropColor = Colors.transparent,
       this.borderRadius,
+      this.height = kToolbarHeight,
       this.isDismissable = true,
       this.locked = true,
       Key key})
       : assert(body != null),
         assert(expandedBuilder != null),
+        assert(height != null),
         super(key: key);
 
   @override
@@ -66,10 +70,22 @@ class BottomSheetBarController {
   void _listener() => _listeners.forEach((f) => f?.call());
 }
 
+class MeasureSize extends StatefulWidget {
+  final Widget child;
+  final Function(Size) onChange;
+
+  const MeasureSize({
+    Key key,
+    @required this.onChange,
+    @required this.child,
+  }) : super(key: key);
+
+  @override
+  _MeasureSizeState createState() => _MeasureSizeState();
+}
+
 class _BottomSheetBarState extends State<BottomSheetBar>
     with SingleTickerProviderStateMixin {
-  final _keyCollapsed = GlobalKey();
-  final _keyExpanded = GlobalKey();
   final _scrollController = ScrollController();
   final _velocityTracker = VelocityTracker(PointerDeviceKind.touch);
 
@@ -77,10 +93,9 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   BottomSheetBarController _controller;
   bool _isScrollable = false;
 
-  double _expandedHeight = 0;
-  double _collapsedHeight = 0;
+  var _expandedSize = Size.zero;
 
-  double get _heightDiff => _expandedHeight - _collapsedHeight;
+  double get _heightDiff => _expandedSize.height - widget.height;
 
   @override
   Widget build(BuildContext context) => Stack(
@@ -141,48 +156,23 @@ class _BottomSheetBarState extends State<BottomSheetBar>
             child: AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) => Material(
-                color: _expandedHeight == 0 && _collapsedHeight == 0
-                    ? Colors.transparent
-                    : widget.color,
+                color: widget.color,
                 borderRadius: widget.borderRadius,
                 elevation: 0,
                 child: SafeArea(
                   child: Ink(
-                    height: _expandedHeight == 0 && _collapsedHeight == 0
-                        ? double.infinity
-                        : _animationController.value * _heightDiff +
-                            _collapsedHeight,
+                    width: _expandedSize.width,
+                    height: _animationController.value * _heightDiff +
+                        widget.height,
                     child: Stack(
                       children: [
                         if (widget.collapsed != null)
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: FadeTransition(
-                              opacity: Tween(begin: 1.0, end: 0.0)
-                                  .animate(_animationController),
-                              child: IgnorePointer(
-                                ignoring: !_controller.isCollapsed,
-                                child: Container(
-                                  key: _keyCollapsed,
-                                  child: widget.collapsed,
-                                ),
-                              ),
-                            ),
-                          ),
-                        if (widget.expandedBuilder != null)
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: FadeTransition(
-                              opacity: Tween(begin: 0.0, end: 1.0)
-                                  .animate(_animationController),
-                              child: IgnorePointer(
-                                ignoring: _controller.isCollapsed,
-                                child: Container(
-                                  key: _keyExpanded,
-                                  child:
-                                      widget.expandedBuilder(_scrollController),
-                                ),
-                              ),
+                          FadeTransition(
+                            opacity: Tween(begin: 1.0, end: 0.0)
+                                .animate(_animationController),
+                            child: IgnorePointer(
+                              ignoring: !_controller.isCollapsed,
+                              child: widget.collapsed,
                             ),
                           ),
                       ],
@@ -192,6 +182,19 @@ class _BottomSheetBarState extends State<BottomSheetBar>
               ),
             ),
           ),
+
+          if (widget.expandedBuilder != null)
+            FadeTransition(
+              opacity:
+                  Tween(begin: -13.0, end: 1.0).animate(_animationController),
+              child: IgnorePointer(
+                ignoring: _controller.isCollapsed,
+                child: MeasureSize(
+                  onChange: (size) => setState(() => _expandedSize = size),
+                  child: widget.expandedBuilder(_scrollController),
+                ),
+              ),
+            ),
         ],
       );
 
@@ -202,23 +205,12 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   }
 
   @override
-  void didUpdateWidget(BottomSheetBar oldWidget) {
-    _expandedHeight = 0;
-    _collapsedHeight = 0;
-    WidgetsBinding.instance.addPostFrameCallback(_setHeights);
-
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(_setHeights);
     super.initState();
 
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 250),
-      value: 0.0,
     );
 
     _scrollController.addListener(() {
@@ -256,16 +248,29 @@ class _BottomSheetBarState extends State<BottomSheetBar>
       setState(() => _isScrollable = dy < 0);
     }
   }
+}
 
-  void _setHeights([dynamic _]) {
-    final RenderBox collapsedBox =
-        _keyCollapsed.currentContext?.findRenderObject();
-    if (collapsedBox == null) return;
-    setState(() => _collapsedHeight = collapsedBox.size.height);
+class _MeasureSizeState extends State<MeasureSize> {
+  var widgetKey = GlobalKey();
 
-    final RenderBox expandedBox =
-        _keyExpanded.currentContext?.findRenderObject();
-    if (expandedBox == null) return;
-    setState(() => _expandedHeight = expandedBox.size.height);
+  var oldSize;
+  @override
+  Widget build(BuildContext context) {
+    SchedulerBinding.instance.addPostFrameCallback(postFrameCallback);
+    return Container(
+      key: widgetKey,
+      child: widget.child,
+    );
+  }
+
+  void postFrameCallback(_) {
+    var context = widgetKey.currentContext;
+    if (context == null) return;
+
+    var newSize = context.size;
+    if (oldSize == newSize) return;
+
+    oldSize = newSize;
+    widget.onChange(newSize);
   }
 }
