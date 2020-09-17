@@ -135,47 +135,30 @@ class _BottomSheetBarState extends State<BottomSheetBar>
           ),
 
           // Bottom Sheet Bar
-          Listener(
-            onPointerDown: widget.locked
-                ? null
-                : (event) => _velocityTracker.addPosition(
-                    event.timeStamp, event.position),
-            onPointerMove: widget.locked
-                ? null
-                : (event) {
-                    _velocityTracker.addPosition(
-                        event.timeStamp, event.position);
-                    _eventMove(event.delta.dy);
-                  },
-            onPointerUp: widget.locked
-                ? null
-                : (_) => _eventEnd(_velocityTracker.getVelocity()),
-            onPointerCancel: widget.locked
-                ? null
-                : (_) => _eventEnd(_velocityTracker.getVelocity()),
-            child: AnimatedBuilder(
+          _listenerWrap(
+            AnimatedBuilder(
               animation: _animationController,
-              builder: (context, child) => Material(
-                color: widget.color,
-                borderRadius: widget.borderRadius,
-                elevation: 0,
-                child: SafeArea(
-                  child: Ink(
-                    width: double.infinity,
-                    height: _animationController.value * _heightDiff +
-                        widget.height,
-                    child: Stack(
-                      children: [
-                        if (widget.collapsed != null)
-                          FadeTransition(
-                            opacity: Tween(begin: 1.0, end: 0.0)
-                                .animate(_animationController),
-                            child: IgnorePointer(
-                              ignoring: !_controller.isCollapsed,
+              builder: (context, child) => IgnorePointer(
+                ignoring: !_controller.isCollapsed,
+                child: Material(
+                  color: widget.color,
+                  borderRadius: widget.borderRadius,
+                  elevation: 0,
+                  child: SafeArea(
+                    child: Ink(
+                      width: double.infinity,
+                      height: _animationController.value * _heightDiff +
+                          widget.height,
+                      child: Stack(
+                        children: [
+                          if (widget.collapsed != null)
+                            FadeTransition(
+                              opacity: Tween(begin: 1.0, end: 0.0)
+                                  .animate(_animationController),
                               child: widget.collapsed,
                             ),
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -184,20 +167,46 @@ class _BottomSheetBarState extends State<BottomSheetBar>
           ),
 
           if (widget.expandedBuilder != null)
-            SafeArea(
-              child: FadeTransition(
-                opacity:
-                    Tween(begin: -13.0, end: 1.0).animate(_animationController),
-                child: IgnorePointer(
-                  ignoring: _controller.isCollapsed,
-                  child: MeasureSize(
-                    onChange: (size) => setState(() => _expandedSize = size),
-                    child: widget.expandedBuilder(_scrollController),
+            AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) => IgnorePointer(
+                ignoring: _controller.isCollapsed,
+                child: SafeArea(
+                  child: FadeTransition(
+                    opacity: Tween(begin: -13.0, end: 1.0)
+                        .animate(_animationController),
+                    child: _listenerWrap(
+                      MeasureSize(
+                        onChange: (size) =>
+                            setState(() => _expandedSize = size),
+                        child: widget.expandedBuilder(_scrollController),
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
         ],
+      );
+
+  Listener _listenerWrap(Widget child) => Listener(
+        onPointerDown: widget.locked
+            ? null
+            : (event) =>
+                _velocityTracker.addPosition(event.timeStamp, event.position),
+        onPointerMove: widget.locked
+            ? null
+            : (event) {
+                _velocityTracker.addPosition(event.timeStamp, event.position);
+                _eventMove(event.delta.dy);
+              },
+        onPointerUp: widget.locked
+            ? null
+            : (_) => _eventEnd(_velocityTracker.getVelocity()),
+        onPointerCancel: widget.locked
+            ? null
+            : (_) => _eventEnd(_velocityTracker.getVelocity()),
+        child: child,
       );
 
   @override
