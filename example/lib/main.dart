@@ -31,6 +31,7 @@ class ExampleApp extends StatelessWidget {
 
 class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
   bool _isLocked = false;
+  final itemList = List<int>.generate(300, (index) => index * index);
   final _bsbController = BottomSheetBarController();
 
   @override
@@ -46,29 +47,32 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
             topLeft: Radius.circular(32.0),
             topRight: Radius.circular(32.0),
           ),
-          expandedBuilder: _isLocked
-              ? (scrollController) => CustomScrollView(
-                    shrinkWrap: true,
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Container(
-                          height: 256.0,
-                          child: Text('Locked+Expanded Bottom Sheet'),
+          expandedBuilder: (scrollController) => CustomScrollView(
+            controller: scrollController,
+            shrinkWrap: true,
+            slivers: [
+              SliverFixedExtentList(
+                itemExtent: 56.0, // I'm forcing item heights
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => ListTile(
+                    title: Text(
+                      itemList[index].toString(),
+                      style: TextStyle(fontSize: 20.0),
+                    ),
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(
+                          itemList[index].toString(),
                         ),
                       ),
-                    ],
-                  )
-              : (scrollController) => CustomScrollView(
-                    shrinkWrap: true,
-                    slivers: [
-                      SliverToBoxAdapter(
-                        child: Container(
-                          height: 512.0,
-                          child: Text('Expanded Bottom Sheet'),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
+                  childCount: itemList.length,
+                ),
+              ),
+            ],
+          ),
           collapsed: FlatButton(
             onPressed: () => _bsbController.expand(),
             child: Text('Click to expand'),
