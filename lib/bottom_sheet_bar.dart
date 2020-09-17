@@ -184,14 +184,16 @@ class _BottomSheetBarState extends State<BottomSheetBar>
           ),
 
           if (widget.expandedBuilder != null)
-            FadeTransition(
-              opacity:
-                  Tween(begin: -13.0, end: 1.0).animate(_animationController),
-              child: IgnorePointer(
-                ignoring: _controller.isCollapsed,
-                child: MeasureSize(
-                  onChange: (size) => setState(() => _expandedSize = size),
-                  child: widget.expandedBuilder(_scrollController),
+            SafeArea(
+              child: FadeTransition(
+                opacity:
+                    Tween(begin: -13.0, end: 1.0).animate(_animationController),
+                child: IgnorePointer(
+                  ignoring: _controller.isCollapsed,
+                  child: MeasureSize(
+                    onChange: (size) => setState(() => _expandedSize = size),
+                    child: widget.expandedBuilder(_scrollController),
+                  ),
                 ),
               ),
             ),
