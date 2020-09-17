@@ -69,12 +69,9 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
                       ),
                     ],
                   ),
-          collapsed: Container(
-            height: kToolbarHeight + 12.0,
-            child: FlatButton(
-              onPressed: () => _bsbController.expand(),
-              child: Text('Click to expand'),
-            ),
+          collapsed: FlatButton(
+            onPressed: () => _bsbController.expand(),
+            child: Text('Click to expand'),
           ),
           body: Center(
             child: Column(
