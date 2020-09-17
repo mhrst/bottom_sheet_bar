@@ -161,7 +161,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                 elevation: 0,
                 child: SafeArea(
                   child: Ink(
-                    width: _expandedSize.width,
+                    width: double.infinity,
                     height: _animationController.value * _heightDiff +
                         widget.height,
                     child: Stack(
