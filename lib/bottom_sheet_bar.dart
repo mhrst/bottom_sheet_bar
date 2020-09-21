@@ -87,7 +87,7 @@ class MeasureSize extends StatefulWidget {
 class _BottomSheetBarState extends State<BottomSheetBar>
     with SingleTickerProviderStateMixin {
   final _scrollController = ScrollController();
-  final _velocityTracker = VelocityTracker(PointerDeviceKind.touch);
+  final _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.touch);
 
   AnimationController _animationController;
   BottomSheetBarController _controller;
@@ -102,13 +102,9 @@ class _BottomSheetBarState extends State<BottomSheetBar>
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           // Body
-          AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) => Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              child: widget.body,
-            ),
+          Padding(
+            child: widget.body,
+            padding: EdgeInsets.only(bottom: widget.height),
           ),
 
           // Backdrop
