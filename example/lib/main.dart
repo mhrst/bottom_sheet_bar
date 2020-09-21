@@ -77,7 +77,8 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
             onPressed: () => _bsbController.expand(),
             child: Text('Click to expand'),
           ),
-          body: Center(
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -92,6 +93,7 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
                   _isLocked
                       ? 'Bottom sheet cannot be expanded or collapsed by swiping'
                       : 'Swipe it to expand or collapse the bottom sheet',
+                  textAlign: TextAlign.center,
                 ),
               ],
             ),
