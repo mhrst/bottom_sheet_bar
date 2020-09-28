@@ -4,20 +4,45 @@ import 'package:flutter/scheduler.dart';
 
 const VELOCITY_MIN = 320.0;
 
+/// A toolbar that aligns to the bottom of a widget and expands into a bottom
+/// sheet.
 class BottomSheetBar extends StatefulWidget {
+  /// The toolbar will be aligned to the bottom of the body [Widget]. Padding
+  /// equal to [height] is added to the bottom of this widget.
   final Widget body;
+
+  /// A function to build the widget displayed when the bottom sheet is
+  /// expanded. If the expanded content is scrollable, pass the provided
+  /// [ScrollController] to the scrollable widget.
   final Widget Function(ScrollController) expandedBuilder;
+
+  /// A [Widget] to be displayed on the toolbar in its collapsed state
   final Widget collapsed;
+
+  /// The height of the collapsed toolbar. Defaults to [kToolbarHeight] (56.0)
   final double height;
 
+  /// A controller can be used to listen to events, and expand and collapse the
+  /// bottom sheet.
   final BottomSheetBarController controller;
 
+  /// The background color of the toolbar and bottom sheet. Defaults to
+  /// [Colors.white]
   final Color color;
+
+  /// The backdrop color that overlays the [body] widget when the bottom sheet
+  /// is expanded. Defaults to [Colors.transparent] (no backdrop)
   final Color backdropColor;
 
+  /// Provide a border-radius to adjust the shape of the toolbar
   final BorderRadiusGeometry borderRadius;
 
+  /// If [true], the bottom sheet can be dismissed by tapping elsewhere. Defaults
+  /// to [true]
   final bool isDismissable;
+
+  /// If [true], the bottom sheet cannot be opened or closed with a swipe gesture.
+  /// Defaults to [true]
   final bool locked;
 
   BottomSheetBar(
@@ -41,47 +66,46 @@ class BottomSheetBar extends StatefulWidget {
   _BottomSheetBarState createState() => _BottomSheetBarState();
 }
 
+/// A controller used to expand or collapse the bottom sheet of a
+/// [BottomSheetBar]. Listeners can be added to respond to expand and collapse
+/// events. The expanded or collapsed state can also be determined through this
+/// controller.
 class BottomSheetBarController {
   AnimationController _animationController;
   final _listeners = <Function>[];
 
+  /// Only returns [true] if the bottom sheet if fully collapsed
   bool get isCollapsed => _animationController?.value == 0.0;
 
+  /// Only returns [true] if the bottom sheet if fully expanded
   bool get isExpanded => _animationController?.value == 1.0;
 
+  /// Adds a function to be called on every animation frame
   void addListener(Function listener) => _listeners.add(listener);
 
+  /// Used internally to assign the [AnimationController] created by a
+  /// [BottomSheetBar] to this controller. Unless you're using advanced
+  /// animation techniques, you probably won't ever need to use this method.
   void attach(AnimationController animationController) {
     _animationController?.removeListener(_listener);
     _animationController = animationController;
     _animationController?.addListener(_listener);
   }
 
+  /// Collapse the bottom sheet built by [BottomSheetBar.expandedBuilder]
   TickerFuture collapse() => _animationController?.fling(velocity: -1.0);
 
-  void dispose() {
-    _animationController?.removeListener(_listener);
-  }
+  /// Removes all previously added listeners
+  void dispose() =>
+      _listeners.forEach((f) => _animationController?.removeListener(f));
 
+  /// Expand the bottom sheet built by [BottomSheetBar.expandedBuilder]
   TickerFuture expand() => _animationController?.fling(velocity: 1.0);
 
+  /// Remove a previously added listener
   void removeListener(Function listener) => _listeners.remove(listener);
 
   void _listener() => _listeners.forEach((f) => f?.call());
-}
-
-class MeasureSize extends StatefulWidget {
-  final Widget child;
-  final Function(Size) onChange;
-
-  const MeasureSize({
-    Key key,
-    @required this.onChange,
-    @required this.child,
-  }) : super(key: key);
-
-  @override
-  _MeasureSizeState createState() => _MeasureSizeState();
 }
 
 class _BottomSheetBarState extends State<BottomSheetBar>
@@ -122,6 +146,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                 child: Container(
                   height: MediaQuery.of(context).size.height,
                   width: MediaQuery.of(context).size.width,
+                  // TODO: Change this to Fade widget for better performance
                   color: widget.backdropColor.withOpacity(
                       _animationController.value *
                           widget.backdropColor.opacity),
@@ -172,7 +197,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                     opacity: Tween(begin: -13.0, end: 1.0)
                         .animate(_animationController),
                     child: _listenerWrap(
-                      MeasureSize(
+                      _MeasureSize(
                         onChange: (size) =>
                             setState(() => _expandedSize = size),
                         child: widget.expandedBuilder(_scrollController),
@@ -183,26 +208,6 @@ class _BottomSheetBarState extends State<BottomSheetBar>
               ),
             ),
         ],
-      );
-
-  Listener _listenerWrap(Widget child) => Listener(
-        onPointerDown: widget.locked
-            ? null
-            : (event) =>
-                _velocityTracker.addPosition(event.timeStamp, event.position),
-        onPointerMove: widget.locked
-            ? null
-            : (event) {
-                _velocityTracker.addPosition(event.timeStamp, event.position);
-                _eventMove(event.delta.dy);
-              },
-        onPointerUp: widget.locked
-            ? null
-            : (_) => _eventEnd(_velocityTracker.getVelocity()),
-        onPointerCancel: widget.locked
-            ? null
-            : (_) => _eventEnd(_velocityTracker.getVelocity()),
-        child: child,
       );
 
   @override
@@ -255,9 +260,43 @@ class _BottomSheetBarState extends State<BottomSheetBar>
       setState(() => _isScrollable = dy < 0);
     }
   }
+
+  Listener _listenerWrap(Widget child) => Listener(
+        onPointerDown: widget.locked
+            ? null
+            : (event) =>
+                _velocityTracker.addPosition(event.timeStamp, event.position),
+        onPointerMove: widget.locked
+            ? null
+            : (event) {
+                _velocityTracker.addPosition(event.timeStamp, event.position);
+                _eventMove(event.delta.dy);
+              },
+        onPointerUp: widget.locked
+            ? null
+            : (_) => _eventEnd(_velocityTracker.getVelocity()),
+        onPointerCancel: widget.locked
+            ? null
+            : (_) => _eventEnd(_velocityTracker.getVelocity()),
+        child: child,
+      );
 }
 
-class _MeasureSizeState extends State<MeasureSize> {
+class _MeasureSize extends StatefulWidget {
+  final Widget child;
+  final Function(Size) onChange;
+
+  const _MeasureSize({
+    Key key,
+    @required this.onChange,
+    @required this.child,
+  }) : super(key: key);
+
+  @override
+  _MeasureSizeState createState() => _MeasureSizeState();
+}
+
+class _MeasureSizeState extends State<_MeasureSize> {
   var widgetKey = GlobalKey();
 
   var oldSize;
