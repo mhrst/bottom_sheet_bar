@@ -260,11 +260,16 @@ class _BottomSheetBarState extends State<BottomSheetBar>
     if (_controller.isExpanded &&
         _scrollController.hasClients &&
         _scrollController.offset <= 0) {
-      setState(() => _isScrollable = dy < 0);
+      setState(() => _isScrollable = dy <= 0);
     }
   }
 
   Listener _listenerWrap(Widget child) => Listener(
+        onPointerSignal: (ps) {
+          if (ps is PointerScrollEvent) {
+            _eventMove(ps.delta.dy);
+          }
+        },
         onPointerDown: widget.locked
             ? null
             : (event) =>
