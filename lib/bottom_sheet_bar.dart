@@ -129,9 +129,11 @@ class _BottomSheetBarState extends State<BottomSheetBar>
         alignment: Alignment.bottomCenter,
         children: <Widget>[
           // Body
-          Padding(
-            child: widget.body,
-            padding: EdgeInsets.only(bottom: widget.height),
+          Positioned.fill(
+            child: Padding(
+              child: widget.body,
+              padding: EdgeInsets.only(bottom: widget.height),
+            ),
           ),
 
           // Backdrop
