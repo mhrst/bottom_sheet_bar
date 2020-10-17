@@ -81,6 +81,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.10-nullsafety.1"
+  measure_size:
+    dependency: transitive
+    description:
+      name: measure_size
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0+1"
   meta:
     dependency: transitive
     description:

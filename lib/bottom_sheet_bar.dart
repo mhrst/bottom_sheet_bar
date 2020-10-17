@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:measure_size/measure_size.dart';
 
 const VELOCITY_MIN = 320.0;
 
@@ -202,7 +203,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                     opacity: Tween(begin: -13.0, end: 1.0)
                         .animate(_animationController),
                     child: _listenerWrap(
-                      _MeasureSize(
+                      MeasureSize(
                         onChange: (size) =>
                             setState(() => _expandedSize = size),
                         child: widget.expandedBuilder(_scrollController),
@@ -290,43 +291,4 @@ class _BottomSheetBarState extends State<BottomSheetBar>
             : (_) => _eventEnd(_velocityTracker.getVelocity()),
         child: child,
       );
-}
-
-class _MeasureSize extends StatefulWidget {
-  final Widget child;
-  final Function(Size) onChange;
-
-  const _MeasureSize({
-    Key key,
-    @required this.onChange,
-    @required this.child,
-  }) : super(key: key);
-
-  @override
-  _MeasureSizeState createState() => _MeasureSizeState();
-}
-
-class _MeasureSizeState extends State<_MeasureSize> {
-  var widgetKey = GlobalKey();
-
-  var oldSize;
-  @override
-  Widget build(BuildContext context) {
-    SchedulerBinding.instance.addPostFrameCallback(postFrameCallback);
-    return Container(
-      key: widgetKey,
-      child: widget.child,
-    );
-  }
-
-  void postFrameCallback(_) {
-    var context = widgetKey.currentContext;
-    if (context == null) return;
-
-    var newSize = context.size;
-    if (oldSize == newSize) return;
-
-    oldSize = newSize;
-    widget.onChange(newSize);
-  }
 }
