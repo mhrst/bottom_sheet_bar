@@ -1,5 +1,11 @@
 # bottom_sheet_bar
 
+A toolbar that aligns to the bottom of a widget and expands into a bottom sheet.
+
+| Short content           | Long content      | Scrollable content |
+|:-----------------------:|:-----------------:|:------------------:|
+|![](swipe_short.gif)     | ![](swipe_up.gif) | ![](scroll.gif)    |
+
 ```dart
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 
