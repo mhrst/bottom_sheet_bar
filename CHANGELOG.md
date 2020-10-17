@@ -1,3 +1,7 @@
+## [1.0.1+4] - 2020-10-17
+### Fixed
+- Body widget gets placed in a full-size container
+
 ## [1.0.0+3] - 2020-10-08
 ### Fixed
 - Content overflowing bottom sheet now scrollable with scroll gestures other than touch (mousewheel, trackpad, etc.)
