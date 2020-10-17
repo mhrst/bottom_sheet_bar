@@ -1,6 +1,6 @@
 {
-    "name": "bottomsheet_bar",
-    "short_name": "bottomsheet_bar",
+    "name": "bottom_sheet_bar",
+    "short_name": "bottom_sheet_bar",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
