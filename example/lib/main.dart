@@ -75,7 +75,7 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
           ),
           collapsed: FlatButton(
             onPressed: () => _bsbController.expand(),
-            child: Text('Click to expand'),
+            child: Text('Click${_isLocked ? "" : " or swipe"} to expand'),
           ),
           body: Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.0),
