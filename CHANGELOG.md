@@ -1,3 +1,7 @@
+## [1.0.1+5] - 2020-10-17
+### Changed
+- Moved `MeasureSize` widget to https://pub.dev/packages/measure_size
+
 ## [1.0.1+4] - 2020-10-17
 ### Fixed
 - Body widget gets placed in a full-size container

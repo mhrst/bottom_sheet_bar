@@ -1,7 +1,7 @@
 name: bottom_sheet_bar
 description: A toolbar that aligns to the bottom of a widget and expands into a bottom sheet.
 repository: https://github.com/truthmast/bottom_sheet_bar
-version: 1.0.1+4
+version: 1.0.1+5
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
