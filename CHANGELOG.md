@@ -1,3 +1,7 @@
+## [1.0.2+6] - 2020-10-18
+### Added
+- Optional property `borderRadiusExpanded` to animate and display a different border-radius in the expanded state
+
 ## [1.0.1+5] - 2020-10-17
 ### Changed
 - Moved `MeasureSize` widget to https://pub.dev/packages/measure_size
