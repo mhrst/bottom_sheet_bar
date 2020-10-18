@@ -38,6 +38,10 @@ class BottomSheetBar extends StatefulWidget {
   /// Provide a border-radius to adjust the shape of the toolbar
   final BorderRadiusGeometry borderRadius;
 
+  /// Provide a border-radius to adjust the shape of the bottom-sheet
+  /// when expanded
+  final BorderRadiusGeometry borderRadiusExpanded;
+
   /// If [true], the bottom sheet can be dismissed by tapping elsewhere. Defaults
   /// to [true]
   final bool isDismissable;
@@ -54,6 +58,7 @@ class BottomSheetBar extends StatefulWidget {
       this.color = Colors.white,
       this.backdropColor = Colors.transparent,
       this.borderRadius,
+      this.borderRadiusExpanded,
       this.height = kToolbarHeight,
       this.isDismissable = true,
       this.locked = true,
@@ -165,12 +170,20 @@ class _BottomSheetBarState extends State<BottomSheetBar>
           _listenerWrap(
             AnimatedBuilder(
               animation: _animationController,
+              child: widget.collapsed,
               builder: (context, child) => IgnorePointer(
                 ignoring: !_controller.isCollapsed,
-                child: Material(
-                  color: widget.color,
-                  borderRadius: widget.borderRadius,
-                  elevation: 0,
+                child: AnimatedContainer(
+                  duration: Duration.zero,
+                  decoration: BoxDecoration(
+                    color: widget.color,
+                    borderRadius: BorderRadius.lerp(
+                      widget.borderRadius,
+                      widget.borderRadiusExpanded ?? widget.borderRadius,
+                      _animationController.value,
+                    ),
+                  ),
+                  //elevation: 0,
                   child: SafeArea(
                     child: Ink(
                       width: double.infinity,
@@ -182,7 +195,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                             FadeTransition(
                               opacity: Tween(begin: 1.0, end: 0.0)
                                   .animate(_animationController),
-                              child: widget.collapsed,
+                              child: child,
                             ),
                         ],
                       ),

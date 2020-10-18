@@ -47,6 +47,10 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
             topLeft: Radius.circular(32.0),
             topRight: Radius.circular(32.0),
           ),
+          borderRadiusExpanded: BorderRadius.only(
+            topLeft: Radius.circular(0.0),
+            topRight: Radius.circular(0.0),
+          ),
           expandedBuilder: (scrollController) => CustomScrollView(
             controller: scrollController,
             shrinkWrap: true,
