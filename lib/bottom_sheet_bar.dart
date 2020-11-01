@@ -118,9 +118,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
     with SingleTickerProviderStateMixin {
   final _scrollController = ScrollController();
 
-  /// TODO: Replace with [VelocityTracker.withKind] when released to stable
-  /// final _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.touch);
-  final _velocityTracker = VelocityTracker();
+  final _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.unknown);
 
   AnimationController _animationController;
   BottomSheetBarController _controller;

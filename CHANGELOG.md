@@ -1,3 +1,7 @@
+## [Unreleased]
+### Fixed
+- No longer using deprecated `VelocityTracker` constructor
+
 ## [1.0.2+6] - 2020-10-18
 ### Added
 - Optional property `borderRadiusExpanded` to animate and display a different border-radius in the expanded state
