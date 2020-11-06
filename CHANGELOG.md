@@ -34,7 +34,8 @@
 ## [1.0.0+1] - 2020-09-26
 - Initial release
 
-[Unreleased]: https://github.com/truthmast/bottom_sheet_bar/compare/e3e4463b33a5164bfb6e9355a006b221c65990ad...HEAD
+[Unreleased]: https://github.com/truthmast/bottom_sheet_bar/compare/44955fb42f5484c9bc753f0466f1b6be061493bf...HEAD
+[1.0.2+7]: https://github.com/truthmast/bottom_sheet_bar/compare/e3e4463b33a5164bfb6e9355a006b221c65990ad...44955fb42f5484c9bc753f0466f1b6be061493bf
 [1.0.2+6]: https://github.com/truthmast/bottom_sheet_bar/compare/81945ff94376c66055298dea6373063b50d41f52...e3e4463b33a5164bfb6e9355a006b221c65990ad
 [1.0.1+5]: https://github.com/truthmast/bottom_sheet_bar/compare/0fb7b4fc6c19a33bcfdf8e1e09a4e776add70d45...81945ff94376c66055298dea6373063b50d41f52
 [1.0.1+4]: https://github.com/truthmast/bottom_sheet_bar/compare/a14c9b679f6cd51a6042234ceeb05b5e470fce90...0fb7b4fc6c19a33bcfdf8e1e09a4e776add70d45
