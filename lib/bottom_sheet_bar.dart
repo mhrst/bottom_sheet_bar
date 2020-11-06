@@ -134,9 +134,11 @@ class _BottomSheetBarState extends State<BottomSheetBar>
         children: <Widget>[
           // Body
           Positioned.fill(
-            child: Padding(
-              child: widget.body,
-              padding: EdgeInsets.only(bottom: widget.height),
+            child: SafeArea(
+              child: Padding(
+                child: widget.body,
+                padding: EdgeInsets.only(bottom: widget.height),
+              ),
             ),
           ),
 

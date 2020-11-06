@@ -1,6 +1,7 @@
-## [Unreleased]
+## [1.0.2+7] - 2020-11-06
 ### Fixed
 - No longer using deprecated `VelocityTracker` constructor
+- Bottom of body is no longer obscured when a bottom-safe-area is present
 
 ## [1.0.2+6] - 2020-10-18
 ### Added
