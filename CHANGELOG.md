@@ -1,3 +1,7 @@
+## [2.0.0] - 2021-03-07
+### Changed
+- Migrated to null safety
+
 ## [1.0.2+7] - 2020-11-06
 ### Fixed
 - No longer using deprecated `VelocityTracker` constructor

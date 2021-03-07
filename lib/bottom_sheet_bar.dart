@@ -17,15 +17,16 @@ class BottomSheetBar extends StatefulWidget {
   /// [ScrollController] to the scrollable widget.
   final Widget Function(ScrollController) expandedBuilder;
 
-  /// A [Widget] to be displayed on the toolbar in its collapsed state
-  final Widget collapsed;
+  /// A [Widget] to be displayed on the toolbar in its collapsed state. When
+  /// null, the toolbar will be empty.
+  final Widget? collapsed;
 
   /// The height of the collapsed toolbar. Defaults to [kToolbarHeight] (56.0)
   final double height;
 
   /// A controller can be used to listen to events, and expand and collapse the
   /// bottom sheet.
-  final BottomSheetBarController controller;
+  final BottomSheetBarController? controller;
 
   /// The background color of the toolbar and bottom sheet. Defaults to
   /// [Colors.white]
@@ -36,11 +37,11 @@ class BottomSheetBar extends StatefulWidget {
   final Color backdropColor;
 
   /// Provide a border-radius to adjust the shape of the toolbar
-  final BorderRadiusGeometry borderRadius;
+  final BorderRadius? borderRadius;
 
   /// Provide a border-radius to adjust the shape of the bottom-sheet
   /// when expanded
-  final BorderRadiusGeometry borderRadiusExpanded;
+  final BorderRadius? borderRadiusExpanded;
 
   /// If [true], the bottom sheet can be dismissed by tapping elsewhere. Defaults
   /// to [true]
@@ -50,23 +51,20 @@ class BottomSheetBar extends StatefulWidget {
   /// Defaults to [true]
   final bool locked;
 
-  BottomSheetBar(
-      {@required this.body,
-      @required this.expandedBuilder,
-      this.collapsed,
-      this.controller,
-      this.color = Colors.white,
-      this.backdropColor = Colors.transparent,
-      this.borderRadius,
-      this.borderRadiusExpanded,
-      this.height = kToolbarHeight,
-      this.isDismissable = true,
-      this.locked = true,
-      Key key})
-      : assert(body != null),
-        assert(expandedBuilder != null),
-        assert(height != null),
-        super(key: key);
+  BottomSheetBar({
+    required this.body,
+    required this.expandedBuilder,
+    this.collapsed,
+    this.controller,
+    this.color = Colors.white,
+    this.backdropColor = Colors.transparent,
+    this.borderRadius,
+    this.borderRadiusExpanded,
+    this.height = kToolbarHeight,
+    this.isDismissable = true,
+    this.locked = true,
+    Key? key,
+  }) : super(key: key);
 
   @override
   _BottomSheetBarState createState() => _BottomSheetBarState();
@@ -77,8 +75,8 @@ class BottomSheetBar extends StatefulWidget {
 /// events. The expanded or collapsed state can also be determined through this
 /// controller.
 class BottomSheetBarController {
-  AnimationController _animationController;
-  final _listeners = <Function>[];
+  AnimationController? _animationController;
+  final _listeners = <Function()>[];
 
   /// Only returns [true] if the bottom sheet if fully collapsed
   bool get isCollapsed => _animationController?.value == 0.0;
@@ -87,7 +85,7 @@ class BottomSheetBarController {
   bool get isExpanded => _animationController?.value == 1.0;
 
   /// Adds a function to be called on every animation frame
-  void addListener(Function listener) => _listeners.add(listener);
+  void addListener(Function() listener) => _listeners.add(listener);
 
   /// Used internally to assign the [AnimationController] created by a
   /// [BottomSheetBar] to this controller. Unless you're using advanced
@@ -99,32 +97,31 @@ class BottomSheetBarController {
   }
 
   /// Collapse the bottom sheet built by [BottomSheetBar.expandedBuilder]
-  TickerFuture collapse() => _animationController?.fling(velocity: -1.0);
+  TickerFuture? collapse() => _animationController?.fling(velocity: -1.0);
 
   /// Removes all previously added listeners
   void dispose() =>
       _listeners.forEach((f) => _animationController?.removeListener(f));
 
   /// Expand the bottom sheet built by [BottomSheetBar.expandedBuilder]
-  TickerFuture expand() => _animationController?.fling(velocity: 1.0);
+  TickerFuture? expand() => _animationController?.fling(velocity: 1.0);
 
   /// Remove a previously added listener
   void removeListener(Function listener) => _listeners.remove(listener);
 
-  void _listener() => _listeners.forEach((f) => f?.call());
+  void _listener() => _listeners.forEach((f) => f.call());
 }
 
 class _BottomSheetBarState extends State<BottomSheetBar>
     with SingleTickerProviderStateMixin {
   final _scrollController = ScrollController();
-
   final _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.unknown);
 
-  AnimationController _animationController;
-  BottomSheetBarController _controller;
   bool _isScrollable = false;
+  Size _expandedSize = Size.zero;
 
-  var _expandedSize = Size.zero;
+  late AnimationController _animationController;
+  late BottomSheetBarController _controller;
 
   double get _heightDiff => _expandedSize.height - widget.height;
 
@@ -189,16 +186,17 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                       width: double.infinity,
                       height: _animationController.value * _heightDiff +
                           widget.height,
-                      child: Stack(
-                        children: [
-                          if (widget.collapsed != null)
-                            FadeTransition(
-                              opacity: Tween(begin: 1.0, end: 0.0)
-                                  .animate(_animationController),
-                              child: child,
+                      child: child == null
+                          ? null
+                          : Stack(
+                              children: [
+                                FadeTransition(
+                                  opacity: Tween(begin: 1.0, end: 0.0)
+                                      .animate(_animationController),
+                                  child: child,
+                                ),
+                              ],
                             ),
-                        ],
-                      ),
                     ),
                   ),
                 ),
@@ -206,26 +204,24 @@ class _BottomSheetBarState extends State<BottomSheetBar>
             ),
           ),
 
-          if (widget.expandedBuilder != null)
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) => IgnorePointer(
-                ignoring: _controller.isCollapsed,
-                child: SafeArea(
-                  child: FadeTransition(
-                    opacity: Tween(begin: -13.0, end: 1.0)
-                        .animate(_animationController),
-                    child: _listenerWrap(
-                      MeasureSize(
-                        onChange: (size) =>
-                            setState(() => _expandedSize = size),
-                        child: widget.expandedBuilder(_scrollController),
-                      ),
+          AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) => IgnorePointer(
+              ignoring: _controller.isCollapsed,
+              child: SafeArea(
+                child: FadeTransition(
+                  opacity: Tween(begin: -13.0, end: 1.0)
+                      .animate(_animationController),
+                  child: _listenerWrap(
+                    MeasureSize(
+                      onChange: (size) => setState(() => _expandedSize = size),
+                      child: widget.expandedBuilder(_scrollController),
                     ),
                   ),
                 ),
               ),
             ),
+          ),
         ],
       );
 
