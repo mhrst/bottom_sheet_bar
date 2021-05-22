@@ -1,3 +1,7 @@
+## [2.0.1] - 2021-05-22
+### Added
+- Add optional box-shadows to BottomSheetBar widget
+
 ## [2.0.0] - 2021-03-07
 ### Changed
 - Migrated to null safety

@@ -43,6 +43,9 @@ class BottomSheetBar extends StatefulWidget {
   /// when expanded
   final BorderRadius? borderRadiusExpanded;
 
+  /// Provide a box-shadow list to add to [Ink] widget
+  final List<BoxShadow>? boxShadows;
+
   /// If [true], the bottom sheet can be dismissed by tapping elsewhere. Defaults
   /// to [true]
   final bool isDismissable;
@@ -60,6 +63,7 @@ class BottomSheetBar extends StatefulWidget {
     this.backdropColor = Colors.transparent,
     this.borderRadius,
     this.borderRadiusExpanded,
+    this.boxShadows,
     this.height = kToolbarHeight,
     this.isDismissable = true,
     this.locked = true,
@@ -133,8 +137,8 @@ class _BottomSheetBarState extends State<BottomSheetBar>
           Positioned.fill(
             child: SafeArea(
               child: Padding(
-                child: widget.body,
                 padding: EdgeInsets.only(bottom: widget.height),
+                child: widget.body,
               ),
             ),
           ),
@@ -167,7 +171,6 @@ class _BottomSheetBarState extends State<BottomSheetBar>
           _listenerWrap(
             AnimatedBuilder(
               animation: _animationController,
-              child: widget.collapsed,
               builder: (context, child) => IgnorePointer(
                 ignoring: !_controller.isCollapsed,
                 child: AnimatedContainer(
@@ -183,6 +186,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                   //elevation: 0,
                   child: SafeArea(
                     child: Ink(
+                      decoration: BoxDecoration(boxShadow: widget.boxShadows),
                       width: double.infinity,
                       height: _animationController.value * _heightDiff +
                           widget.height,
@@ -201,6 +205,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                   ),
                 ),
               ),
+              child: widget.collapsed,
             ),
           ),
 

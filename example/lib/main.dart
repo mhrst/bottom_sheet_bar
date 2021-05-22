@@ -51,6 +51,14 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
             topLeft: Radius.circular(0.0),
             topRight: Radius.circular(0.0),
           ),
+          boxShadows: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 5.0,
+              blurRadius: 32.0,
+              offset: Offset(0, 0), // changes position of shadow
+            ),
+          ],
           expandedBuilder: (scrollController) => CustomScrollView(
             controller: scrollController,
             shrinkWrap: true,
@@ -77,7 +85,7 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
               ),
             ],
           ),
-          collapsed: FlatButton(
+          collapsed: TextButton(
             onPressed: () => _bsbController.expand(),
             child: Text('Click${_isLocked ? "" : " or swipe"} to expand'),
           ),
