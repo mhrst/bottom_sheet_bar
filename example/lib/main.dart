@@ -8,7 +8,7 @@ void main() {
 class BottomSheetBarPage extends StatefulWidget {
   final String title;
 
-  BottomSheetBarPage({Key key, this.title}) : super(key: key);
+  BottomSheetBarPage({Key? key, this.title = ''}) : super(key: key);
 
   @override
   _BottomSheetBarPageState createState() => _BottomSheetBarPageState();
