@@ -26,7 +26,7 @@ class ExampleApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: const BottomSheetBarPage(title: 'BottomSheetBar Demo Home Page'),
+      home: const BottomSheetBarPage(title: 'BottomSheetBar'),
     );
   }
 }
@@ -40,6 +40,18 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
+          actions: [
+            if (!_bsbController.isExpanded)
+              IconButton(
+                icon: Icon(Icons.open_in_full),
+                onPressed: _bsbController.expand,
+              ),
+            if (!_bsbController.isCollapsed)
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: _bsbController.collapse,
+              ),
+          ],
         ),
         body: BottomSheetBar(
           backdropColor: Colors.green,
