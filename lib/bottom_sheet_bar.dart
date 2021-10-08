@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:measure_size/measure_size.dart';
 
-const VELOCITY_MIN = 320.0;
+const kVelocityMin = 320.0;
 
 /// A toolbar that aligns to the bottom of a widget and expands into a bottom
 /// sheet.
@@ -54,7 +54,7 @@ class BottomSheetBar extends StatefulWidget {
   /// Defaults to [true]
   final bool locked;
 
-  BottomSheetBar({
+  const BottomSheetBar({
     required this.body,
     required this.expandedBuilder,
     this.collapsed,
@@ -104,8 +104,11 @@ class BottomSheetBarController {
   TickerFuture? collapse() => _animationController?.fling(velocity: -1.0);
 
   /// Removes all previously added listeners
-  void dispose() =>
-      _listeners.forEach((f) => _animationController?.removeListener(f));
+  void dispose() {
+    for (var listener in _listeners) {
+      _animationController?.removeListener(listener);
+    }
+  }
 
   /// Expand the bottom sheet built by [BottomSheetBar.expandedBuilder]
   TickerFuture? expand() => _animationController?.fling(velocity: 1.0);
@@ -113,7 +116,11 @@ class BottomSheetBarController {
   /// Remove a previously added listener
   void removeListener(Function listener) => _listeners.remove(listener);
 
-  void _listener() => _listeners.forEach((f) => f.call());
+  void _listener() {
+    for (var listener in _listeners) {
+      listener.call();
+    }
+  }
 }
 
 class _BottomSheetBarState extends State<BottomSheetBar>
@@ -155,13 +162,13 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                   }
                 },
                 onTap: _controller.collapse,
-                child: Container(
-                  height: MediaQuery.of(context).size.height,
-                  width: MediaQuery.of(context).size.width,
-                  // TODO: Change this to Fade widget for better performance
-                  color: widget.backdropColor.withOpacity(
-                      _animationController.value *
-                          widget.backdropColor.opacity),
+                child: FadeTransition(
+                  opacity: _animationController,
+                  child: Container(
+                    height: MediaQuery.of(context).size.height,
+                    width: MediaQuery.of(context).size.width,
+                    color: widget.backdropColor,
+                  ),
                 ),
               ),
             ),
@@ -192,14 +199,10 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                           widget.height,
                       child: child == null
                           ? null
-                          : Stack(
-                              children: [
-                                FadeTransition(
-                                  opacity: Tween(begin: 1.0, end: 0.0)
-                                      .animate(_animationController),
-                                  child: child,
-                                ),
-                              ],
+                          : FadeTransition(
+                              opacity: Tween(begin: 1.0, end: 0.0)
+                                  .animate(_animationController),
+                              child: child,
                             ),
                     ),
                   ),
@@ -242,7 +245,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 250),
     );
 
     _scrollController.addListener(() {
@@ -258,7 +261,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
     if (_animationController.isAnimating ||
         (_controller.isExpanded && _isScrollable)) {
       return;
-    } else if (velocity.pixelsPerSecond.dy.abs() >= VELOCITY_MIN) {
+    } else if (velocity.pixelsPerSecond.dy.abs() >= kVelocityMin) {
       _animationController.fling(
         velocity: -1 * (velocity.pixelsPerSecond.dy / _heightDiff),
       );
