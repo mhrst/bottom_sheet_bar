@@ -1,5 +1,6 @@
 import 'package:bottom_sheet_bar/bottom_sheet_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const ExampleApp());
@@ -33,22 +34,56 @@ class ExampleApp extends StatelessWidget {
 
 class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
   bool _isLocked = false;
-  final itemList = List<int>.generate(300, (index) => index * index);
+  bool _isCollapsed = true;
+  bool _isExpanded = false;
+  int _listSize = 5;
   final _bsbController = BottomSheetBarController();
+  final _listSizeController = TextEditingController(text: '5');
+
+  @override
+  void initState() {
+    _bsbController.addListener(_onBsbChanged);
+    _listSizeController.addListener(_onListSizeChanged);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _bsbController.removeListener(_onBsbChanged);
+    super.dispose();
+  }
+
+  void _onListSizeChanged() {
+    _listSize = int.tryParse(_listSizeController.text) ?? 5;
+  }
+
+  void _onBsbChanged() {
+    if (_bsbController.isCollapsed && !_isCollapsed) {
+      setState(() {
+        _isCollapsed = true;
+        _isExpanded = false;
+      });
+    } else if (_bsbController.isExpanded && !_isExpanded) {
+      setState(() {
+        _isCollapsed = false;
+        _isExpanded = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
           actions: [
-            if (!_bsbController.isExpanded)
+            if (_isCollapsed)
               IconButton(
-                icon: Icon(Icons.open_in_full),
+                icon: const Icon(Icons.open_in_full),
                 onPressed: _bsbController.expand,
               ),
-            if (!_bsbController.isCollapsed)
+            if (_isExpanded)
               IconButton(
-                icon: Icon(Icons.close),
+                icon: const Icon(Icons.close),
                 onPressed: _bsbController.collapse,
               ),
           ],
@@ -74,32 +109,36 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
               offset: const Offset(0, 0), // changes position of shadow
             ),
           ],
-          expandedBuilder: (scrollController) => CustomScrollView(
-            controller: scrollController,
-            shrinkWrap: true,
-            slivers: [
-              SliverFixedExtentList(
-                itemExtent: 56.0, // I'm forcing item heights
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) => ListTile(
-                    title: Text(
-                      itemList[index].toString(),
-                      style: const TextStyle(fontSize: 20.0),
-                    ),
-                    onTap: () => showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(
-                          itemList[index].toString(),
+          expandedBuilder: (scrollController) {
+            final itemList =
+                List<int>.generate(_listSize, (index) => index + 1);
+            return CustomScrollView(
+              controller: scrollController,
+              shrinkWrap: true,
+              slivers: [
+                SliverFixedExtentList(
+                  itemExtent: 56.0, // I'm forcing item heights
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) => ListTile(
+                      title: Text(
+                        itemList[index].toString(),
+                        style: const TextStyle(fontSize: 20.0),
+                      ),
+                      onTap: () => showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: Text(
+                            itemList[index].toString(),
+                          ),
                         ),
                       ),
                     ),
+                    childCount: _listSize,
                   ),
-                  childCount: itemList.length,
                 ),
-              ),
-            ],
-          ),
+              ],
+            );
+          },
           collapsed: TextButton(
             onPressed: () => _bsbController.expand(),
             child: Text('Click${_isLocked ? "" : " or swipe"} to expand'),
@@ -119,6 +158,17 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
                       ? 'Bottom sheet cannot be expanded or collapsed by swiping'
                       : 'Swipe it to expand or collapse the bottom sheet',
                   textAlign: TextAlign.center,
+                ),
+                SizedBox(
+                  width: 250,
+                  child: TextField(
+                    textAlign: TextAlign.center,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    controller: _listSizeController,
+                    decoration: const InputDecoration(
+                        hintText: 'Number of expanded list-items'),
+                  ),
                 ),
               ],
             ),
