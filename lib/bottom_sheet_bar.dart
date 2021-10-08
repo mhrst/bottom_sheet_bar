@@ -106,6 +106,7 @@ class BottomSheetBarController {
   /// Removes all previously added listeners
   void dispose() {
     for (var listener in _listeners) {
+      removeListener(listener);
       _animationController?.removeListener(listener);
     }
   }
@@ -181,29 +182,27 @@ class _BottomSheetBarState extends State<BottomSheetBar>
               builder: (context, child) => IgnorePointer(
                 ignoring: !_controller.isCollapsed,
                 child: AnimatedContainer(
+                  clipBehavior: Clip.hardEdge,
                   duration: Duration.zero,
                   decoration: BoxDecoration(
-                    color: widget.color,
+                    boxShadow: widget.boxShadows,
                     borderRadius: BorderRadius.lerp(
                       widget.borderRadius,
                       widget.borderRadiusExpanded ?? widget.borderRadius,
                       _animationController.value,
                     ),
                   ),
-                  //elevation: 0,
-                  child: SafeArea(
-                    child: Ink(
-                      decoration: BoxDecoration(boxShadow: widget.boxShadows),
-                      width: double.infinity,
-                      height: _animationController.value * _heightDiff +
-                          widget.height,
-                      child: child == null
-                          ? null
-                          : FadeTransition(
-                              opacity: Tween(begin: 1.0, end: 0.0)
-                                  .animate(_animationController),
-                              child: child,
-                            ),
+                  height:
+                      _animationController.value * _heightDiff + widget.height,
+                  width: double.infinity,
+                  child: Material(
+                    color: widget.color,
+                    child: SafeArea(
+                      child: FadeTransition(
+                        opacity: Tween(begin: 1.0, end: 0.0)
+                            .animate(_animationController),
+                        child: child,
+                      ),
                     ),
                   ),
                 ),
@@ -285,11 +284,13 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   }
 
   Listener _listenerWrap(Widget child) => Listener(
-        onPointerSignal: (ps) {
-          if (ps is PointerScrollEvent) {
-            _eventMove(ps.delta.dy);
-          }
-        },
+        onPointerSignal: widget.locked
+            ? null
+            : (ps) {
+                if (ps is PointerScrollEvent) {
+                  _eventMove(ps.delta.dy);
+                }
+              },
         onPointerDown: widget.locked
             ? null
             : (event) =>
