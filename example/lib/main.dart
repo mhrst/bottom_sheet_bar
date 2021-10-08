@@ -141,7 +141,10 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
           },
           collapsed: TextButton(
             onPressed: () => _bsbController.expand(),
-            child: Text('Click${_isLocked ? "" : " or swipe"} to expand'),
+            child: Text(
+              'Click${_isLocked ? "" : " or swipe"} to expand',
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
           body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
