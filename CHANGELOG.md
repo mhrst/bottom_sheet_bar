@@ -1,3 +1,9 @@
+## [2.1.0] - 2021-10-09
+### Fixed
+- Swiping to open/close works more consistently
+- Made isCollapsed and isExpanded reliable
+- Inkwell animations appear on the BottomSheetBar background
+
 ## [2.0.1] - 2021-05-22
 ### Added
 - Add optional box-shadows to BottomSheetBar widget
