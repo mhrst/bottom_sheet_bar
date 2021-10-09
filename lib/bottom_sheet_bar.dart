@@ -83,10 +83,10 @@ class BottomSheetBarController {
   final _listeners = <Function()>[];
 
   /// Only returns [true] if the bottom sheet is 10% expanded or less
-  bool get isCollapsed => (_animationController?.value ?? 0) <= 0.1;
+  bool get isCollapsed => _animationController?.value == 0.0;
 
   /// Only returns [true] if the bottom sheet is 90% expanded or more
-  bool get isExpanded => (_animationController?.value ?? 0) >= 0.9;
+  bool get isExpanded => _animationController?.value == 1.0;
 
   /// Adds a function to be called on every animation frame
   void addListener(Function() listener) => _listeners.add(listener);
@@ -101,7 +101,9 @@ class BottomSheetBarController {
   }
 
   /// Collapse the bottom sheet built by [BottomSheetBar.expandedBuilder]
-  TickerFuture? collapse() => _animationController?.fling(velocity: -1.0);
+  Future? collapse() => _animationController
+      ?.fling(velocity: -1.0)
+      .then((_) => _animationController?.animateTo(0.0));
 
   /// Removes all previously added listeners
   void dispose() {
@@ -112,7 +114,9 @@ class BottomSheetBarController {
   }
 
   /// Expand the bottom sheet built by [BottomSheetBar.expandedBuilder]
-  TickerFuture? expand() => _animationController?.fling(velocity: 1.0);
+  Future? expand() => _animationController
+      ?.fling(velocity: 1.0)
+      .then((_) => _animationController?.animateTo(1.0));
 
   /// Remove a previously added listener
   void removeListener(Function listener) => _listeners.remove(listener);
@@ -129,7 +133,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   final _scrollController = ScrollController();
   final _velocityTracker = VelocityTracker.withKind(PointerDeviceKind.unknown);
 
-  bool _isScrollable = false;
+  bool _isScrolled = false;
   Size _expandedSize = Size.zero;
 
   late AnimationController _animationController;
@@ -248,7 +252,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
     );
 
     _scrollController.addListener(() {
-      if (widget.locked || _isScrollable) return;
+      if (widget.locked || _isScrolled) return;
       _scrollController.jumpTo(0);
     });
 
@@ -258,7 +262,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
 
   void _eventEnd(Velocity velocity) {
     if (_animationController.isAnimating ||
-        (_controller.isExpanded && _isScrollable)) {
+        (_controller.isExpanded && _isScrolled)) {
       return;
     } else if (velocity.pixelsPerSecond.dy.abs() >= kVelocityMin) {
       _animationController.fling(
@@ -272,14 +276,17 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   }
 
   void _eventMove(double dy) {
-    if (!_isScrollable) {
+    if (!_isScrolled) {
       _animationController.value -= dy / _heightDiff;
     }
 
     if (_controller.isExpanded &&
         _scrollController.hasClients &&
         _scrollController.offset <= 0) {
-      setState(() => _isScrollable = dy <= 0);
+      setState(() => _isScrolled = dy <= 0);
+    } else if (_controller.isCollapsed) {
+      _scrollController.jumpTo(0);
+      setState(() => _isScrolled = false);
     }
   }
 
