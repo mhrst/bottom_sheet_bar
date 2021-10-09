@@ -82,11 +82,11 @@ class BottomSheetBarController {
   AnimationController? _animationController;
   final _listeners = <Function()>[];
 
-  /// Only returns [true] if the bottom sheet if fully collapsed
-  bool get isCollapsed => _animationController?.value == 0.0;
+  /// Only returns [true] if the bottom sheet is 10% expanded or less
+  bool get isCollapsed => (_animationController?.value ?? 0) <= 0.1;
 
-  /// Only returns [true] if the bottom sheet if fully expanded
-  bool get isExpanded => _animationController?.value == 1.0;
+  /// Only returns [true] if the bottom sheet is 90% expanded or more
+  bool get isExpanded => (_animationController?.value ?? 0) >= 0.9;
 
   /// Adds a function to be called on every animation frame
   void addListener(Function() listener) => _listeners.add(listener);
