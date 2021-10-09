@@ -1,6 +1,6 @@
 name: bottom_sheet_bar
 description: A toolbar that aligns to the bottom of a widget and expands into a bottom sheet.
-version: 2.0.1
+version: 2.1.0
 homepage: https://github.com/mhrst/bottom_sheet_bar
 repository: https://github.com/mhrst/bottom_sheet_bar
 issue_tracker: https://github.com/mhrst/bottom_sheet_bar/issues
