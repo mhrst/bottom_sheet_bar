@@ -1,3 +1,7 @@
+## [2.1.1] - 2021-10-12
+### Fixed
+- Widget accomodates for safe-area spaces (bottom-notch, etc.)
+
 ## [2.1.0] - 2021-10-09
 ### Fixed
 - Swiping to open/close works more consistently
