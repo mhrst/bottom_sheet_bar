@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:measure_size/measure_size.dart';
 
 const kVelocityMin = 320.0;
@@ -185,23 +184,23 @@ class _BottomSheetBarState extends State<BottomSheetBar>
               animation: _animationController,
               builder: (context, child) => IgnorePointer(
                 ignoring: !_controller.isCollapsed,
-                child: AnimatedContainer(
-                  clipBehavior: Clip.hardEdge,
-                  duration: Duration.zero,
-                  decoration: BoxDecoration(
-                    boxShadow: widget.boxShadows,
-                    borderRadius: BorderRadius.lerp(
-                      widget.borderRadius,
-                      widget.borderRadiusExpanded ?? widget.borderRadius,
-                      _animationController.value,
-                    ),
-                  ),
-                  height:
-                      _animationController.value * _heightDiff + widget.height,
-                  width: double.infinity,
-                  child: Material(
-                    color: widget.color,
-                    child: SafeArea(
+                child: Material(
+                  color: widget.color,
+                  child: SafeArea(
+                    child: AnimatedContainer(
+                      clipBehavior: Clip.hardEdge,
+                      duration: Duration.zero,
+                      decoration: BoxDecoration(
+                        boxShadow: widget.boxShadows,
+                        borderRadius: BorderRadius.lerp(
+                          widget.borderRadius,
+                          widget.borderRadiusExpanded ?? widget.borderRadius,
+                          _animationController.value,
+                        ),
+                      ),
+                      height: _animationController.value * _heightDiff +
+                          widget.height,
+                      width: double.infinity,
                       child: FadeTransition(
                         opacity: Tween(begin: 1.0, end: 0.0)
                             .animate(_animationController),
