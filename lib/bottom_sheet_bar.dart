@@ -70,7 +70,7 @@ class BottomSheetBar extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BottomSheetBarState createState() => _BottomSheetBarState();
+  State<BottomSheetBar> createState() => _BottomSheetBarState();
 }
 
 /// A controller used to expand or collapse the bottom sheet of a
