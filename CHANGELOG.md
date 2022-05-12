@@ -1,3 +1,6 @@
+## [2.2.0] - 2022-05-12
+- Updated for Flutter 3
+
 ## [2.1.1] - 2021-10-12
 ### Fixed
 - Widget accomodates for safe-area spaces (bottom-notch, etc.)
@@ -52,7 +55,9 @@
 ## [1.0.0+1] - 2020-09-26
 - Initial release
 
-[Unreleased]: https://github.com/mhrst/bottom_sheet_bar/compare/f3a35f11d31e37d883d21e0803264ff8f89c4940...HEAD
+
+[Unreleased]: https://github.com/mhrst/bottom_sheet_bar/compare/0c962a7baa33a0b30d2c841dad63acc24ec5b462...HEAD
+[2.2.0]: https://github.com/mhrst/bottom_sheet_bar/compare/f3a35f11d31e37d883d21e0803264ff8f89c4940...0c962a7baa33a0b30d2c841dad63acc24ec5b462
 [2.0.0]: https://github.com/mhrst/bottom_sheet_bar/compare/44955fb42f5484c9bc753f0466f1b6be061493bf...f3a35f11d31e37d883d21e0803264ff8f89c4940
 [1.0.2+7]: https://github.com/mhrst/bottom_sheet_bar/compare/e3e4463b33a5164bfb6e9355a006b221c65990ad...44955fb42f5484c9bc753f0466f1b6be061493bf
 [1.0.2+6]: https://github.com/mhrst/bottom_sheet_bar/compare/81945ff94376c66055298dea6373063b50d41f52...e3e4463b33a5164bfb6e9355a006b221c65990ad
