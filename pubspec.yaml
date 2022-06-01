@@ -1,12 +1,13 @@
 name: bottom_sheet_bar
 description: A toolbar that aligns to the bottom of a widget and expands into a bottom sheet.
-version: 2.2.0
+version: 2.2.1
 homepage: https://github.com/mhrst/bottom_sheet_bar
 repository: https://github.com/mhrst/bottom_sheet_bar
 issue_tracker: https://github.com/mhrst/bottom_sheet_bar/issues
 
 environment:
   sdk: '>=2.12.0 <3.0.0'
+  flutter: '>=3.0.0'
 
 dependencies:
   flutter:
