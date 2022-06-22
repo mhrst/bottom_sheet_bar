@@ -1,3 +1,9 @@
+## [2.3.1] - 2022-06-22
+- Fix box-shadows appearing above bar color
+- `color` defaults to `T`heme.of(context).bottomAppBarColor`
+  - The default is still `Colors.white`
+- Reduce number of `build` calls in widget tree
+
 ## [2.2.1] - 2022-06-01
 - Set Flutter SDK constraint
 
@@ -59,7 +65,9 @@
 - Initial release
 
 
-[Unreleased]: https://github.com/mhrst/bottom_sheet_bar/compare/9fe9692dd11c497c74b29170c08aaa5a8f74d6c0...HEAD
+9ff88ea8ca87cb5fb3f6efeba353196df61218d8
+[Unreleased]: https://github.com/mhrst/bottom_sheet_bar/compare/9ff88ea8ca87cb5fb3f6efeba353196df61218d8...HEAD
+[2.3.1]: https://github.com/mhrst/bottom_sheet_bar/compare/9fe9692dd11c497c74b29170c08aaa5a8f74d6c0...9ff88ea8ca87cb5fb3f6efeba353196df61218d8
 [2.2.1]: https://github.com/mhrst/bottom_sheet_bar/compare/0c962a7baa33a0b30d2c841dad63acc24ec5b462...9fe9692dd11c497c74b29170c08aaa5a8f74d6c0
 [2.2.0]: https://github.com/mhrst/bottom_sheet_bar/compare/f3a35f11d31e37d883d21e0803264ff8f89c4940...0c962a7baa33a0b30d2c841dad63acc24ec5b462
 [2.0.0]: https://github.com/mhrst/bottom_sheet_bar/compare/44955fb42f5484c9bc753f0466f1b6be061493bf...f3a35f11d31e37d883d21e0803264ff8f89c4940
