@@ -26,6 +26,7 @@ class ExampleApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
+        bottomAppBarColor: Colors.lightBlueAccent,
       ),
       home: const BottomSheetBarPage(title: 'BottomSheetBar'),
     );
@@ -91,7 +92,6 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
         body: BottomSheetBar(
           backdropColor: Colors.green,
           locked: _isLocked,
-          color: Colors.lightBlueAccent,
           controller: _bsbController,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(32.0),
