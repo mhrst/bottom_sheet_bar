@@ -1,3 +1,4 @@
+import 'package:bottom_sheet_bar/bottom_sheet_bar_listener.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:measure_size/measure_size.dart';
@@ -141,45 +142,50 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   double get _heightDiff => _expandedSize.height - widget.height;
 
   @override
-  Widget build(BuildContext context) => Stack(
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-          // Body
-          Positioned.fill(
-            child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: widget.height),
-                child: widget.body,
+  Widget build(BuildContext context) => BottomSheetBarListener(
+        locked: widget.locked,
+        onEnd: () => _eventEnd(_velocityTracker.getVelocity()),
+        onPosition: _velocityTracker.addPosition,
+        onScroll: _eventMove,
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            // Body
+            Positioned.fill(
+              child: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: widget.height),
+                  child: widget.body,
+                ),
               ),
             ),
-          ),
 
-          // Backdrop
-          AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, _) => IgnorePointer(
-              ignoring: !widget.isDismissable || _controller.isCollapsed,
-              child: GestureDetector(
-                onVerticalDragEnd: (DragEndDetails details) {
-                  if (details.velocity.pixelsPerSecond.dy > 0) {
-                    _controller.collapse();
-                  }
-                },
-                onTap: _controller.collapse,
-                child: FadeTransition(
-                  opacity: _animationController,
-                  child: Container(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
-                    color: widget.backdropColor,
+            // Backdrop
+            AnimatedBuilder(
+              animation: _animationController,
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                color: widget.backdropColor,
+              ),
+              builder: (context, child) => IgnorePointer(
+                ignoring: !widget.isDismissable || _controller.isCollapsed,
+                child: GestureDetector(
+                  onVerticalDragEnd: (DragEndDetails details) {
+                    if (details.velocity.pixelsPerSecond.dy > 0) {
+                      _controller.collapse();
+                    }
+                  },
+                  onTap: _controller.collapse,
+                  child: FadeTransition(
+                    opacity: _animationController,
+                    child: child,
                   ),
                 ),
               ),
             ),
-          ),
 
-          // Bottom Sheet Bar
-          _listenerWrap(
+            // Bottom Sheet Bar
             AnimatedBuilder(
               animation: _animationController,
               builder: (context, child) => IgnorePointer(
@@ -212,27 +218,25 @@ class _BottomSheetBarState extends State<BottomSheetBar>
               ),
               child: widget.collapsed,
             ),
-          ),
 
-          AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) => IgnorePointer(
-              ignoring: _controller.isCollapsed,
-              child: SafeArea(
-                child: FadeTransition(
-                  opacity: Tween(begin: -13.0, end: 1.0)
-                      .animate(_animationController),
-                  child: _listenerWrap(
-                    MeasureSize(
-                      onChange: (size) => setState(() => _expandedSize = size),
-                      child: widget.expandedBuilder(_scrollController),
-                    ),
-                  ),
+            AnimatedBuilder(
+              animation: _animationController,
+              child: MeasureSize(
+                onChange: (size) => setState(() => _expandedSize = size),
+                child: widget.expandedBuilder(_scrollController),
+              ),
+              builder: (context, child) => IgnorePointer(
+                ignoring: _controller.isCollapsed,
+                child: SafeArea(
+                  child: FadeTransition(
+                      opacity: Tween(begin: -13.0, end: 1.0)
+                          .animate(_animationController),
+                      child: child),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
 
   @override
@@ -288,31 +292,4 @@ class _BottomSheetBarState extends State<BottomSheetBar>
       setState(() => _isScrolled = false);
     }
   }
-
-  Listener _listenerWrap(Widget child) => Listener(
-        onPointerSignal: widget.locked
-            ? null
-            : (ps) {
-                if (ps is PointerScrollEvent) {
-                  _eventMove(ps.delta.dy);
-                }
-              },
-        onPointerDown: widget.locked
-            ? null
-            : (event) =>
-                _velocityTracker.addPosition(event.timeStamp, event.position),
-        onPointerMove: widget.locked
-            ? null
-            : (event) {
-                _velocityTracker.addPosition(event.timeStamp, event.position);
-                _eventMove(event.delta.dy);
-              },
-        onPointerUp: widget.locked
-            ? null
-            : (_) => _eventEnd(_velocityTracker.getVelocity()),
-        onPointerCancel: widget.locked
-            ? null
-            : (_) => _eventEnd(_velocityTracker.getVelocity()),
-        child: child,
-      );
 }
