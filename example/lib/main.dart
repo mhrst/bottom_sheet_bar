@@ -90,7 +90,7 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
           ],
         ),
         body: BottomSheetBar(
-          backdropColor: Colors.green,
+          backdropColor: Colors.green.withOpacity(0.8),
           locked: _isLocked,
           controller: _bsbController,
           borderRadius: const BorderRadius.only(
