@@ -33,6 +33,7 @@ BottomSheetBar(
 - **`Color backdropColor`** - The backdrop color that overlays the [body] widget when the bottom sheet is expanded. Defaults to `Colors.transparent` (no backdrop)
 - **`BorderRadius borderRadius`** - Provide a border-radius to adjust the shape of the toolbar
 - **`BorderRadius borderRadiusExpanded`** - Provide a border-radius to adjust the shape of the bottom-sheet when expanded
+- **`List<BoxShadow> boxShadows`** - Provide shadow decoration to the bottom sheet
 - **`double height`** - The height of the collapsed toolbar. Default to `kToolbarHeight` (56.0)
 - **`bool isDismissable`** - If `true`, the bottom sheet can be dismissed by tapping elsewhere. Defaults to `true`
 - **`bool locked`** - If `true`, the bottom sheet cannot be opened or closed with a swipe gesture. Defaults to `true`
