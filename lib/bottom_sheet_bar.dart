@@ -3,11 +3,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:measure_size/measure_size.dart';
 
-const kVelocityMin = 320.0;
-
 /// A toolbar that aligns to the bottom of a widget and expands into a bottom
 /// sheet.
 class BottomSheetBar extends StatefulWidget {
+  /// The minimum vertical speed (measured in pixels-per-second) required to
+  /// collapse or expand the bottom-sheet with a fling gesture
+  final double velocityMin;
+
   /// The toolbar will be aligned to the bottom of the body [Widget]. Padding
   /// equal to [height] is added to the bottom of this widget.
   final Widget body;
@@ -67,6 +69,7 @@ class BottomSheetBar extends StatefulWidget {
     this.height = kToolbarHeight,
     this.isDismissable = true,
     this.locked = true,
+    this.velocityMin = 320.0,
     Key? key,
   }) : super(key: key);
 
@@ -264,7 +267,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
 
     _scrollController.addListener(() {
       if (widget.locked || _isScrolled) return;
-      _scrollController.jumpTo(0);
+      _jumpToZero();
     });
 
     _controller = widget.controller ?? BottomSheetBarController();
@@ -275,7 +278,7 @@ class _BottomSheetBarState extends State<BottomSheetBar>
     if (_animationController.isAnimating ||
         (_controller.isExpanded && _isScrolled)) {
       return;
-    } else if (velocity.pixelsPerSecond.dy.abs() >= kVelocityMin) {
+    } else if (velocity.pixelsPerSecond.dy.abs() >= widget.velocityMin) {
       _animationController.fling(
         velocity: -1 * (velocity.pixelsPerSecond.dy / _heightDiff),
       );
@@ -291,13 +294,17 @@ class _BottomSheetBarState extends State<BottomSheetBar>
       _animationController.value -= dy / _heightDiff;
     }
 
-    if (_controller.isExpanded &&
-        _scrollController.hasClients &&
-        _scrollController.offset <= 0) {
+    if (_controller.isExpanded && _scrollController.offset <= 0) {
       setState(() => _isScrolled = dy <= 0);
     } else if (_controller.isCollapsed) {
-      _scrollController.jumpTo(0);
+      _jumpToZero();
       setState(() => _isScrolled = false);
+    }
+  }
+
+  void _jumpToZero() {
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
     }
   }
 }
