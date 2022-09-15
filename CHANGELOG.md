@@ -1,9 +1,13 @@
+## [2.3.3] - 2022-09-15
+- Added new parameter to adjust fling velocity: `velocityMin`
+- When collapsing, check `ScrollController.hasClients` before resetting scroll position
+
 ## [2.3.2] - 2022-09-08
 - Update `measure_size` pacakge version
 
 ## [2.3.1] - 2022-06-22
 - Fix box-shadows appearing above bar color
-- `color` defaults to `T`heme.of(context).bottomAppBarColor`
+- `color` defaults to `Theme.of(context).bottomAppBarColor`
   - The default is still `Colors.white`
 - Reduce number of `build` calls in widget tree
 
