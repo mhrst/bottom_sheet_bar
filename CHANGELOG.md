@@ -1,3 +1,6 @@
+## [2.3.2] - 2022-09-08
+- Update `measure_size` pacakge version
+
 ## [2.3.1] - 2022-06-22
 - Fix box-shadows appearing above bar color
 - `color` defaults to `T`heme.of(context).bottomAppBarColor`
