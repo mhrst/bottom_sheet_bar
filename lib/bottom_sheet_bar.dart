@@ -197,28 +197,29 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                     alignment: Alignment.bottomCenter,
                     child: IgnorePointer(
                       ignoring: !_controller.isCollapsed,
-                      child: SafeArea(
-                        child: AnimatedContainer(
-                          clipBehavior: Clip.hardEdge,
-                          duration: Duration.zero,
-                          decoration: BoxDecoration(
-                            color: widget.color ??
-                                Theme.of(context).bottomAppBarColor,
-                            boxShadow: widget.boxShadows,
-                            borderRadius: BorderRadius.lerp(
-                              widget.borderRadius,
-                              widget.borderRadiusExpanded ??
-                                  widget.borderRadius,
-                              _animationController.value,
+                      child: Container(
+                        color:
+                            widget.color ?? Theme.of(context).bottomAppBarColor,
+                        child: SafeArea(
+                          child: Container(
+                            clipBehavior: Clip.hardEdge,
+                            decoration: BoxDecoration(
+                              boxShadow: widget.boxShadows,
+                              borderRadius: BorderRadius.lerp(
+                                widget.borderRadius,
+                                widget.borderRadiusExpanded ??
+                                    widget.borderRadius,
+                                _animationController.value,
+                              ),
                             ),
-                          ),
-                          height: _animationController.value * _heightDiff +
-                              widget.height,
-                          width: double.infinity,
-                          child: FadeTransition(
-                            opacity: Tween(begin: 1.0, end: 0.0)
-                                .animate(_animationController),
-                            child: widget.collapsed,
+                            height: _animationController.value * _heightDiff +
+                                widget.height,
+                            width: double.infinity,
+                            child: FadeTransition(
+                              opacity: Tween(begin: 1.0, end: 0.0)
+                                  .animate(_animationController),
+                              child: widget.collapsed,
+                            ),
                           ),
                         ),
                       ),
