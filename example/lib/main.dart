@@ -112,31 +112,36 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
           expandedBuilder: (scrollController) {
             final itemList =
                 List<int>.generate(_listSize, (index) => index + 1);
-            return CustomScrollView(
-              controller: scrollController,
-              shrinkWrap: true,
-              slivers: [
-                SliverFixedExtentList(
-                  itemExtent: 56.0, // I'm forcing item heights
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) => ListTile(
-                      title: Text(
-                        itemList[index].toString(),
-                        style: const TextStyle(fontSize: 20.0),
-                      ),
-                      onTap: () => showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: Text(
-                            itemList[index].toString(),
+
+            // Wrapping the returned widget with [Material] for tap effects
+            return Material(
+              color: Colors.transparent,
+              child: CustomScrollView(
+                controller: scrollController,
+                shrinkWrap: true,
+                slivers: [
+                  SliverFixedExtentList(
+                    itemExtent: 56.0, // I'm forcing item heights
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => ListTile(
+                        title: Text(
+                          itemList[index].toString(),
+                          style: const TextStyle(fontSize: 20.0),
+                        ),
+                        onTap: () => showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: Text(
+                              itemList[index].toString(),
+                            ),
                           ),
                         ),
                       ),
+                      childCount: _listSize,
                     ),
-                    childCount: _listSize,
                   ),
-                ),
-              ],
+                ],
+              ),
             );
           },
           collapsed: TextButton(
