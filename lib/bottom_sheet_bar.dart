@@ -198,20 +198,19 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                     child: IgnorePointer(
                       ignoring: !_controller.isCollapsed,
                       child: Container(
-                        color:
-                            widget.color ?? Theme.of(context).bottomAppBarColor,
+                        clipBehavior: Clip.hardEdge,
+                        decoration: BoxDecoration(
+                          color: widget.color ??
+                              Theme.of(context).bottomAppBarColor,
+                          boxShadow: widget.boxShadows,
+                          borderRadius: BorderRadius.lerp(
+                            widget.borderRadius,
+                            widget.borderRadiusExpanded ?? widget.borderRadius,
+                            _animationController.value,
+                          ),
+                        ),
                         child: SafeArea(
-                          child: Container(
-                            clipBehavior: Clip.hardEdge,
-                            decoration: BoxDecoration(
-                              boxShadow: widget.boxShadows,
-                              borderRadius: BorderRadius.lerp(
-                                widget.borderRadius,
-                                widget.borderRadiusExpanded ??
-                                    widget.borderRadius,
-                                _animationController.value,
-                              ),
-                            ),
+                          child: SizedBox(
                             height: _animationController.value * _heightDiff +
                                 widget.height,
                             width: double.infinity,
