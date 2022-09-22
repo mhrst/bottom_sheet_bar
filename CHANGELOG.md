@@ -1,3 +1,6 @@
+## [2.3.5] - 2022-09-22
+- Fix shadows and layering with `SafeArea`
+
 ## [2.3.4] - 2022-09-20
 - Wrap `SafeArea` with `color` to match bar color
 
