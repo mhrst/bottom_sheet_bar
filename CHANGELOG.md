@@ -1,3 +1,6 @@
+## [2.3.6] - 2022-10-13
+- Added `BackButtonListener` to collapse bottom-sheet when using the device's 'Back' button
+
 ## [2.3.5] - 2022-09-22
 - Fix shadows and layering with `SafeArea`
 
