@@ -145,109 +145,120 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   double get _heightDiff => _expandedSize.height - widget.height;
 
   @override
-  Widget build(BuildContext context) => Stack(
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-          // Body widget
-          Positioned.fill(
-            child: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: widget.height),
-                child: widget.body,
-              ),
-            ),
-          ),
+  Widget build(BuildContext context) => BackButtonListener(
+        onBackButtonPressed: () {
+          if (_controller.isExpanded) {
+            _controller.collapse();
+            return Future.value(true);
+          }
 
-          // Backdrop
-          AnimatedBuilder(
-            animation: _animationController,
-            child: Container(
-              height: MediaQuery.of(context).size.height,
-              width: MediaQuery.of(context).size.width,
-              color: widget.backdropColor,
-            ),
-            builder: (context, child) => IgnorePointer(
-              ignoring: !widget.isDismissable || _controller.isCollapsed,
-              child: GestureDetector(
-                onVerticalDragEnd: (DragEndDetails details) {
-                  if (details.velocity.pixelsPerSecond.dy > 0) {
-                    _controller.collapse();
-                  }
-                },
-                onTap: _controller.collapse,
-                child: FadeTransition(
-                  opacity: _animationController,
-                  child: child,
+          return Future.value(false);
+        },
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: <Widget>[
+            // Body widget
+            Positioned.fill(
+              child: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: widget.height),
+                  child: widget.body,
                 ),
               ),
             ),
-          ),
 
-          /// Collapsed widget
-          BottomSheetBarListener(
-            locked: widget.locked,
-            onEnd: () => _eventEnd(_velocityTracker.getVelocity()),
-            onPosition: _velocityTracker.addPosition,
-            onScroll: _eventMove,
-            child: AnimatedBuilder(
+            // Backdrop
+            AnimatedBuilder(
               animation: _animationController,
-              builder: (context, child) => Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: IgnorePointer(
-                      ignoring: !_controller.isCollapsed,
-                      child: Container(
-                        clipBehavior: Clip.hardEdge,
-                        decoration: BoxDecoration(
-                          color: widget.color ??
-                              Theme.of(context).bottomAppBarColor,
-                          boxShadow: widget.boxShadows,
-                          borderRadius: BorderRadius.lerp(
-                            widget.borderRadius,
-                            widget.borderRadiusExpanded ?? widget.borderRadius,
-                            _animationController.value,
+              child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                color: widget.backdropColor,
+              ),
+              builder: (context, child) => IgnorePointer(
+                ignoring: !widget.isDismissable || _controller.isCollapsed,
+                child: GestureDetector(
+                  onVerticalDragEnd: (DragEndDetails details) {
+                    if (details.velocity.pixelsPerSecond.dy > 0) {
+                      _controller.collapse();
+                    }
+                  },
+                  onTap: _controller.collapse,
+                  child: FadeTransition(
+                    opacity: _animationController,
+                    child: child,
+                  ),
+                ),
+              ),
+            ),
+
+            /// Collapsed widget
+            BottomSheetBarListener(
+              locked: widget.locked,
+              onEnd: () => _eventEnd(_velocityTracker.getVelocity()),
+              onPosition: _velocityTracker.addPosition,
+              onScroll: _eventMove,
+              child: AnimatedBuilder(
+                animation: _animationController,
+                builder: (context, child) => Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: IgnorePointer(
+                        ignoring: !_controller.isCollapsed,
+                        child: Container(
+                          clipBehavior: Clip.hardEdge,
+                          decoration: BoxDecoration(
+                            color: widget.color ??
+                                Theme.of(context).bottomAppBarColor,
+                            boxShadow: widget.boxShadows,
+                            borderRadius: BorderRadius.lerp(
+                              widget.borderRadius,
+                              widget.borderRadiusExpanded ??
+                                  widget.borderRadius,
+                              _animationController.value,
+                            ),
                           ),
-                        ),
-                        child: SafeArea(
-                          child: SizedBox(
-                            height: _animationController.value * _heightDiff +
-                                widget.height,
-                            width: double.infinity,
-                            child: FadeTransition(
-                              opacity: Tween(begin: 1.0, end: 0.0)
-                                  .animate(_animationController),
-                              child: widget.collapsed,
+                          child: SafeArea(
+                            child: SizedBox(
+                              height: _animationController.value * _heightDiff +
+                                  widget.height,
+                              width: double.infinity,
+                              child: FadeTransition(
+                                opacity: Tween(begin: 1.0, end: 0.0)
+                                    .animate(_animationController),
+                                child: widget.collapsed,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
 
-                  /// Expanded widget
-                  Align(
-                    alignment: Alignment.bottomCenter,
-                    child: IgnorePointer(
-                      ignoring: _controller.isCollapsed,
-                      child: SafeArea(
-                        child: FadeTransition(
-                          opacity: Tween(begin: -13.0, end: 1.0)
-                              .animate(_animationController),
-                          child: MeasureSize(
-                            onChange: (size) =>
-                                setState(() => _expandedSize = size),
-                            child: widget.expandedBuilder(_scrollController),
+                    /// Expanded widget
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: IgnorePointer(
+                        ignoring: _controller.isCollapsed,
+                        child: SafeArea(
+                          child: FadeTransition(
+                            opacity: Tween(begin: -13.0, end: 1.0)
+                                .animate(_animationController),
+                            child: MeasureSize(
+                              onChange: (size) =>
+                                  setState(() => _expandedSize = size),
+                              child: widget.expandedBuilder(_scrollController),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
 
   @override
