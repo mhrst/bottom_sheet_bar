@@ -90,6 +90,8 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
           ],
         ),
         body: BottomSheetBar(
+          willPopScope: true,
+          // backButtonListener: true,
           backdropColor: Colors.green.withOpacity(0.8),
           locked: _isLocked,
           controller: _bsbController,
