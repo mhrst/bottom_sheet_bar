@@ -1,3 +1,7 @@
+## [2.3.8] - 2022-10-18
+- Remove `WillPopScope`
+- Add `willPopScope` and `backButtonListener` properties to support handling back-gestures in multiple scenarios
+
 ## [2.3.7] - 2022-10-18
 - Replace `BackButtonListener` with `WillPopScope`
 - Wrap expanded-sheet widget with a `RepaintBoundary`

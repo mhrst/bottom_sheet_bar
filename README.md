@@ -37,6 +37,8 @@ BottomSheetBar(
 - **`double height`** - The height of the collapsed toolbar. Default to `kToolbarHeight` (56.0)
 - **`bool isDismissable`** - If `true`, the bottom sheet can be dismissed by tapping elsewhere. Defaults to `true`
 - **`bool locked`** - If `true`, the bottom sheet cannot be opened or closed with a swipe gesture. Defaults to `true`
+- **`bool willPopScope`** - If `true`, the bottom sheet widget will be wrapped in a `WillPopScope` widget to handle back-gestures. Defaults to `false`
+- **`bool backButtonListener`** - If `true`, the bottom sheet widget will be wrapped in a `BackButtonListener` widget to handle back-gestures. Defaults to `false`
 
 ## `BottomSheetBarController`
 

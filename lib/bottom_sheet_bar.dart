@@ -6,6 +6,12 @@ import 'package:measure_size/measure_size.dart';
 /// A toolbar that aligns to the bottom of a widget and expands into a bottom
 /// sheet.
 class BottomSheetBar extends StatefulWidget {
+  /// Enable wrapping [BottomSheetBar] in [WillPopScope]
+  final bool willPopScope;
+
+  /// Enable wrapping [BottomSheetBar] in [BackButtonListener]
+  final bool backButtonListener;
+
   /// The minimum vertical speed (measured in pixels-per-second) required to
   /// collapse or expand the bottom-sheet with a fling gesture
   final double velocityMin;
@@ -70,8 +76,11 @@ class BottomSheetBar extends StatefulWidget {
     this.isDismissable = true,
     this.locked = true,
     this.velocityMin = 320.0,
+    this.backButtonListener = false,
+    this.willPopScope = false,
     Key? key,
-  }) : super(key: key);
+  })  : assert(!(willPopScope && backButtonListener)),
+        super(key: key);
 
   @override
   State<BottomSheetBar> createState() => _BottomSheetBarState();
@@ -145,7 +154,116 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   double get _heightDiff => _expandedSize.height - widget.height;
 
   @override
-  Widget build(BuildContext context) => WillPopScope(
+  Widget build(BuildContext context) {
+    final child = Stack(
+      alignment: Alignment.bottomCenter,
+      children: <Widget>[
+        // Body widget
+        Positioned.fill(
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(bottom: widget.height),
+              child: widget.body,
+            ),
+          ),
+        ),
+
+        // Backdrop
+        AnimatedBuilder(
+          animation: _animationController,
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
+            color: widget.backdropColor,
+          ),
+          builder: (context, child) => IgnorePointer(
+            ignoring: !widget.isDismissable || _controller.isCollapsed,
+            child: GestureDetector(
+              onVerticalDragEnd: (DragEndDetails details) {
+                if (details.velocity.pixelsPerSecond.dy > 0) {
+                  _controller.collapse();
+                }
+              },
+              onTap: _controller.collapse,
+              child: FadeTransition(
+                opacity: _animationController,
+                child: child,
+              ),
+            ),
+          ),
+        ),
+
+        /// Collapsed widget
+        BottomSheetBarListener(
+          locked: widget.locked,
+          onEnd: () => _eventEnd(_velocityTracker.getVelocity()),
+          onPosition: _velocityTracker.addPosition,
+          onScroll: _eventMove,
+          child: AnimatedBuilder(
+            animation: _animationController,
+            builder: (context, child) => Stack(
+              children: [
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: IgnorePointer(
+                    ignoring: !_controller.isCollapsed,
+                    child: Container(
+                      clipBehavior: Clip.hardEdge,
+                      decoration: BoxDecoration(
+                        color:
+                            widget.color ?? Theme.of(context).bottomAppBarColor,
+                        boxShadow: widget.boxShadows,
+                        borderRadius: BorderRadius.lerp(
+                          widget.borderRadius,
+                          widget.borderRadiusExpanded ?? widget.borderRadius,
+                          _animationController.value,
+                        ),
+                      ),
+                      child: SafeArea(
+                        child: SizedBox(
+                          height: _animationController.value * _heightDiff +
+                              widget.height,
+                          width: double.infinity,
+                          child: FadeTransition(
+                            opacity: Tween(begin: 1.0, end: 0.0)
+                                .animate(_animationController),
+                            child: widget.collapsed,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                /// Expanded widget
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: IgnorePointer(
+                    ignoring: _controller.isCollapsed,
+                    child: SafeArea(
+                      child: FadeTransition(
+                        opacity: Tween(begin: -13.0, end: 1.0)
+                            .animate(_animationController),
+                        child: RepaintBoundary(
+                          child: MeasureSize(
+                            onChange: (size) =>
+                                setState(() => _expandedSize = size),
+                            child: widget.expandedBuilder(_scrollController),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    if (widget.willPopScope) {
+      return WillPopScope(
         onWillPop: () {
           if (_controller.isExpanded) {
             _controller.collapse();
@@ -154,115 +272,24 @@ class _BottomSheetBarState extends State<BottomSheetBar>
 
           return Future.value(true);
         },
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: <Widget>[
-            // Body widget
-            Positioned.fill(
-              child: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: widget.height),
-                  child: widget.body,
-                ),
-              ),
-            ),
-
-            // Backdrop
-            AnimatedBuilder(
-              animation: _animationController,
-              child: Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                color: widget.backdropColor,
-              ),
-              builder: (context, child) => IgnorePointer(
-                ignoring: !widget.isDismissable || _controller.isCollapsed,
-                child: GestureDetector(
-                  onVerticalDragEnd: (DragEndDetails details) {
-                    if (details.velocity.pixelsPerSecond.dy > 0) {
-                      _controller.collapse();
-                    }
-                  },
-                  onTap: _controller.collapse,
-                  child: FadeTransition(
-                    opacity: _animationController,
-                    child: child,
-                  ),
-                ),
-              ),
-            ),
-
-            /// Collapsed widget
-            BottomSheetBarListener(
-              locked: widget.locked,
-              onEnd: () => _eventEnd(_velocityTracker.getVelocity()),
-              onPosition: _velocityTracker.addPosition,
-              onScroll: _eventMove,
-              child: AnimatedBuilder(
-                animation: _animationController,
-                builder: (context, child) => Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: IgnorePointer(
-                        ignoring: !_controller.isCollapsed,
-                        child: Container(
-                          clipBehavior: Clip.hardEdge,
-                          decoration: BoxDecoration(
-                            color: widget.color ??
-                                Theme.of(context).bottomAppBarColor,
-                            boxShadow: widget.boxShadows,
-                            borderRadius: BorderRadius.lerp(
-                              widget.borderRadius,
-                              widget.borderRadiusExpanded ??
-                                  widget.borderRadius,
-                              _animationController.value,
-                            ),
-                          ),
-                          child: SafeArea(
-                            child: SizedBox(
-                              height: _animationController.value * _heightDiff +
-                                  widget.height,
-                              width: double.infinity,
-                              child: FadeTransition(
-                                opacity: Tween(begin: 1.0, end: 0.0)
-                                    .animate(_animationController),
-                                child: widget.collapsed,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    /// Expanded widget
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child: IgnorePointer(
-                        ignoring: _controller.isCollapsed,
-                        child: SafeArea(
-                          child: FadeTransition(
-                            opacity: Tween(begin: -13.0, end: 1.0)
-                                .animate(_animationController),
-                            child: RepaintBoundary(
-                              child: MeasureSize(
-                                onChange: (size) =>
-                                    setState(() => _expandedSize = size),
-                                child:
-                                    widget.expandedBuilder(_scrollController),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+        child: child,
       );
+    } else if (widget.backButtonListener) {
+      return BackButtonListener(
+        onBackButtonPressed: () {
+          if (_controller.isExpanded) {
+            _controller.collapse();
+            return Future.value(true);
+          }
+
+          return Future.value(false);
+        },
+        child: child,
+      );
+    } else {
+      return child;
+    }
+  }
 
   @override
   void dispose() {
