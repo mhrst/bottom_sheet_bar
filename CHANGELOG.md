@@ -1,3 +1,8 @@
+## [2.3.7] - 2022-10-18
+- Replace `BackButtonListener` with `WillPopScope`
+- Wrap expanded-sheet widget with a `RepaintBoundary`
+- Prevent pan-gesture and fling from hiding the `collapsed` widget entirely
+
 ## [2.3.6] - 2022-10-13
 - Added `BackButtonListener` to collapse bottom-sheet when using the device's 'Back' button
 

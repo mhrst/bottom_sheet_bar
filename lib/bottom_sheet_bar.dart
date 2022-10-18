@@ -145,14 +145,14 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   double get _heightDiff => _expandedSize.height - widget.height;
 
   @override
-  Widget build(BuildContext context) => BackButtonListener(
-        onBackButtonPressed: () {
+  Widget build(BuildContext context) => WillPopScope(
+        onWillPop: () {
           if (_controller.isExpanded) {
             _controller.collapse();
-            return Future.value(true);
+            return Future.value(false);
           }
 
-          return Future.value(false);
+          return Future.value(true);
         },
         child: Stack(
           alignment: Alignment.bottomCenter,
@@ -244,10 +244,13 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                           child: FadeTransition(
                             opacity: Tween(begin: -13.0, end: 1.0)
                                 .animate(_animationController),
-                            child: MeasureSize(
-                              onChange: (size) =>
-                                  setState(() => _expandedSize = size),
-                              child: widget.expandedBuilder(_scrollController),
+                            child: RepaintBoundary(
+                              child: MeasureSize(
+                                onChange: (size) =>
+                                    setState(() => _expandedSize = size),
+                                child:
+                                    widget.expandedBuilder(_scrollController),
+                              ),
                             ),
                           ),
                         ),
@@ -289,7 +292,8 @@ class _BottomSheetBarState extends State<BottomSheetBar>
     if (_animationController.isAnimating ||
         (_controller.isExpanded && _isScrolled)) {
       return;
-    } else if (velocity.pixelsPerSecond.dy.abs() >= widget.velocityMin) {
+    } else if (velocity.pixelsPerSecond.dy.abs() >= widget.velocityMin &&
+        _heightDiff > 0) {
       _animationController.fling(
         velocity: -1 * (velocity.pixelsPerSecond.dy / _heightDiff),
       );
@@ -301,11 +305,16 @@ class _BottomSheetBarState extends State<BottomSheetBar>
   }
 
   void _eventMove(double dy) {
+    if (_heightDiff <= 0) {
+      return;
+    }
     if (!_isScrolled) {
       _animationController.value -= dy / _heightDiff;
     }
 
-    if (_controller.isExpanded && _scrollController.offset <= 0) {
+    if (!_scrollController.hasClients) {
+      setState(() => _isScrolled = false);
+    } else if (_controller.isExpanded && _scrollController.offset <= 0) {
       setState(() => _isScrolled = dy <= 0);
     } else if (_controller.isCollapsed) {
       _jumpToZero();
