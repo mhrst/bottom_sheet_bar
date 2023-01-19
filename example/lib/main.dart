@@ -12,65 +12,16 @@ class BottomSheetBarPage extends StatefulWidget {
   const BottomSheetBarPage({Key? key, this.title = ''}) : super(key: key);
 
   @override
-  _BottomSheetBarPageState createState() => _BottomSheetBarPageState();
+  BottomSheetBarPageState createState() => BottomSheetBarPageState();
 }
 
-class ExampleApp extends StatelessWidget {
-  const ExampleApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BottomSheetBar Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-        bottomAppBarColor: Colors.lightBlueAccent,
-      ),
-      home: const BottomSheetBarPage(title: 'BottomSheetBar'),
-    );
-  }
-}
-
-class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
+class BottomSheetBarPageState extends State<BottomSheetBarPage> {
   bool _isLocked = false;
   bool _isCollapsed = true;
   bool _isExpanded = false;
   int _listSize = 5;
   final _bsbController = BottomSheetBarController();
   final _listSizeController = TextEditingController(text: '5');
-
-  @override
-  void initState() {
-    _bsbController.addListener(_onBsbChanged);
-    _listSizeController.addListener(_onListSizeChanged);
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _bsbController.removeListener(_onBsbChanged);
-    super.dispose();
-  }
-
-  void _onListSizeChanged() {
-    _listSize = int.tryParse(_listSizeController.text) ?? 5;
-  }
-
-  void _onBsbChanged() {
-    if (_bsbController.isCollapsed && !_isCollapsed) {
-      setState(() {
-        _isCollapsed = true;
-        _isExpanded = false;
-      });
-    } else if (_bsbController.isExpanded && !_isExpanded) {
-      setState(() {
-        _isCollapsed = false;
-        _isExpanded = true;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -90,8 +41,6 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
           ],
         ),
         body: BottomSheetBar(
-          willPopScope: true,
-          // backButtonListener: true,
           backdropColor: Colors.green.withOpacity(0.8),
           locked: _isLocked,
           controller: _bsbController,
@@ -192,9 +141,58 @@ class _BottomSheetBarPageState extends State<BottomSheetBarPage> {
         ),
       );
 
+  @override
+  void dispose() {
+    _bsbController.removeListener(_onBsbChanged);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _bsbController.addListener(_onBsbChanged);
+    _listSizeController.addListener(_onListSizeChanged);
+    super.initState();
+  }
+
+  void _onBsbChanged() {
+    if (_bsbController.isCollapsed && !_isCollapsed) {
+      setState(() {
+        _isCollapsed = true;
+        _isExpanded = false;
+      });
+    } else if (_bsbController.isExpanded && !_isExpanded) {
+      setState(() {
+        _isCollapsed = false;
+        _isExpanded = true;
+      });
+    }
+  }
+
+  void _onListSizeChanged() {
+    _listSize = int.tryParse(_listSizeController.text) ?? 5;
+  }
+
   void _toggleLock() {
     setState(() {
       _isLocked = !_isLocked;
     });
+  }
+}
+
+class ExampleApp extends StatelessWidget {
+  const ExampleApp({Key? key}) : super(key: key);
+
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'BottomSheetBar Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        bottomAppBarColor: Colors.lightBlueAccent,
+      ),
+      home: const BottomSheetBarPage(title: 'BottomSheetBar'),
+    );
   }
 }
