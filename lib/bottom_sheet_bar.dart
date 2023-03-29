@@ -263,16 +263,19 @@ class _BottomSheetBarState extends State<BottomSheetBar>
     );
 
     if (widget.willPopScope) {
-      return WillPopScope(
-        onWillPop: () {
-          if (_controller.isExpanded) {
-            _controller.collapse();
-            return Future.value(false);
-          }
-
-          return Future.value(true);
+      return AnimatedBuilder(
+        animation: _animationController,
+        builder: (context, _) {
+          return WillPopScope(
+            onWillPop: _controller.isExpanded
+                ? () {
+                    _controller.collapse();
+                    return Future.value(false);
+                  }
+                : null,
+            child: child,
+          );
         },
-        child: child,
       );
     } else if (widget.backButtonListener) {
       return BackButtonListener(
