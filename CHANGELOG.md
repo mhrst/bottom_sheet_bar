@@ -1,3 +1,6 @@
+## [2.3.9] - 2023-03-29
+- Fix back gesture for iOS when bottom-sheet is collapsed
+
 ## [2.3.8] - 2022-10-18
 - Remove `WillPopScope`
 - Add `willPopScope` and `backButtonListener` properties to support handling back-gestures in multiple scenarios
