@@ -210,8 +210,8 @@ class _BottomSheetBarState extends State<BottomSheetBar>
                     child: Container(
                       clipBehavior: Clip.hardEdge,
                       decoration: BoxDecoration(
-                        color:
-                            widget.color ?? Theme.of(context).bottomAppBarColor,
+                        color: widget.color ??
+                            Theme.of(context).bottomAppBarTheme.color,
                         boxShadow: widget.boxShadows,
                         borderRadius: BorderRadius.lerp(
                           widget.borderRadius,
