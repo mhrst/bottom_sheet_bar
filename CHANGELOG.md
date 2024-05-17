@@ -1,3 +1,6 @@
+## [2.3.10] - 2024-05-16
+- Replace deprecated usage of `bottomAppBarColor`
+
 ## [2.3.9] - 2023-03-29
 - Fix back gesture for iOS when bottom-sheet is collapsed
 

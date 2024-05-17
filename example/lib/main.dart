@@ -110,7 +110,7 @@ class BottomSheetBarPageState extends State<BottomSheetBarPage> {
                 const Text('BottomSheetBar is'),
                 Text(
                   _isLocked ? 'Locked' : 'Unlocked',
-                  style: Theme.of(context).textTheme.headline4,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 Text(
                   _isLocked
@@ -190,7 +190,9 @@ class ExampleApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
-        bottomAppBarColor: Colors.lightBlueAccent,
+        bottomAppBarTheme: const BottomAppBarTheme(
+          color: Colors.lightBlueAccent,
+        ),
       ),
       home: const BottomSheetBarPage(title: 'BottomSheetBar'),
     );
