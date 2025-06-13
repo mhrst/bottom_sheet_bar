@@ -1,3 +1,6 @@
+## [2.3.11] - 2025-06-13
+- Handle touchpad scrolling gestures
+
 ## [2.3.10] - 2024-05-16
 - Replace deprecated usage of `bottomAppBarColor`
 
