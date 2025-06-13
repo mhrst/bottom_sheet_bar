@@ -50,6 +50,8 @@ class BottomSheetBarListener extends StatelessWidget {
                 onPosition(event.timeStamp, event.position);
                 onScroll(event.delta.dy);
               },
+        onPointerPanZoomUpdate:
+            locked ? null : (event) => onScroll(event.delta.dy),
         onPointerUp: locked ? null : (_) => onEnd(),
         onPointerCancel: locked ? null : (_) => onEnd(),
         child: child,
